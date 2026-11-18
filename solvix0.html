@@ -1,0 +1,2610 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بكالوريا التاريخ والجغرافيا | SOLVIX0</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cairo & Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        darkBg: '#060913',
+                        cardBg: 'rgba(15, 23, 42, 0.78)',
+                        neonCyan: '#00F5D4',
+                        neonPurple: '#9B5DE5',
+                        neonGold: '#FEE440',
+                        neonPink: '#F15BB5',
+                        neonBlue: '#00BBF9',
+                        neonEmerald: '#10B981'
+                    },
+                    animation: {
+                        'float': 'float 5s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s infinite',
+                        'shake': 'shake 0.45s cubic-bezier(.36,.07,.19,.97) both',
+                        'pop-in': 'popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 15px rgba(0, 245, 212, 0.25)' },
+                            '50%': { boxShadow: '0 0 28px rgba(155, 93, 229, 0.55)' },
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-2px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(4px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-6px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(6px, 0, 0)' }
+                        },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.94) translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'scale(1) translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #060913;
+            color: #F8FAFC;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(13, 20, 38, 0.74);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(20, 30, 56, 0.8), rgba(9, 14, 28, 0.9));
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 245, 212, 0.45);
+            box-shadow: 0 12px 30px -5px rgba(0, 245, 212, 0.18), 0 0 18px rgba(155, 93, 229, 0.2);
+        }
+
+        /* 3D Flashcard Flip */
+        .perspective-1000 { perspective: 1200px; }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1.5rem;
+        }
+        .flip-card-back { transform: rotateY(180deg); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #060913; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00F5D4, #9B5DE5);
+            border-radius: 9999px;
+        }
+
+        /* Text Gradients */
+        .text-gradient-main {
+            background: linear-gradient(135deg, #00F5D4 0%, #00BBF9 50%, #9B5DE5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #FEE440 0%, #F15BB5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Quiz & Match & Timeline Interactive Items */
+        .quiz-option { transition: all 0.22s ease; }
+        .quiz-option:hover:not(:disabled) {
+            transform: translateX(-6px);
+            background: rgba(0, 187, 249, 0.16);
+            border-color: #00BBF9;
+        }
+        .quiz-option.correct {
+            background: rgba(16, 185, 129, 0.26) !important;
+            border-color: #10B981 !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+        }
+        .quiz-option.wrong {
+            background: rgba(239, 68, 68, 0.26) !important;
+            border-color: #EF4444 !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+        }
+
+        .match-item {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .match-item.selected {
+            border-color: #FEE440;
+            background: rgba(254, 228, 64, 0.18);
+            transform: scale(1.02);
+            box-shadow: 0 0 16px rgba(254, 228, 64, 0.3);
+        }
+        .match-item.matched {
+            border-color: #00F5D4;
+            background: rgba(0, 245, 212, 0.14);
+            opacity: 0.45;
+            pointer-events: none;
+        }
+        .match-item.wrong-pair {
+            border-color: #EF4444;
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* Map Pin Pulse */
+        .map-pin {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            transform-origin: center;
+        }
+        .map-pin:hover {
+            transform: scale(1.25);
+        }
+        .solvix-badge {
+            background: linear-gradient(90deg, rgba(0,245,212,0.12), rgba(155,93,229,0.18));
+            border: 1px solid rgba(0,245,212,0.35);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-neonCyan selection:text-darkBg">
+
+    <!-- Particle Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 glass border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
+            <!-- Left/Start: Back Button + Brand -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Prominent Back Button (Always visible when inside any game mode) -->
+                <button id="global-back-btn" onclick="goBack()" class="hidden px-3.5 py-2 rounded-xl bg-gradient-to-r from-neonPink/20 to-neonPurple/25 border border-neonPink/50 hover:border-neonPink text-white font-extrabold text-xs sm:text-sm items-center gap-2 shadow-lg hover:scale-105 transition">
+                    <i class="fa-solid fa-arrow-right text-neonPink"></i>
+                    <span>رجوع</span>
+                </button>
+
+                <!-- Brand Logo -->
+                <div onclick="navigateTo('home')" class="flex items-center gap-2.5 cursor-pointer group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-neonCyan via-neonBlue to-neonPurple flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform shrink-0">
+                        <i class="fa-solid fa-graduation-cap text-darkBg text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-black text-base sm:text-xl tracking-wide text-gradient-main">بكالوريا BAC</h1>
+                            <span class="solvix-badge px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-black tracking-widest text-neonCyan uppercase">SOLVIX0</span>
+                        </div>
+                        <p class="text-[10px] sm:text-[11px] text-slate-400 -mt-0.5 font-tajawal hidden sm:block">المنصة التفاعلية الشاملة • التاريخ والجغرافيا</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right/End: Stats & Sound Controls -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Difficult Cards Counter -->
+                <button onclick="startSpacedRepetitionMode()" class="hidden lg:flex items-center gap-1.5 bg-rose-500/15 border border-rose-500/35 hover:bg-rose-500/25 px-3 py-1.5 rounded-full text-xs font-bold text-rose-300 transition" title="مراجعة المصطلحات الصعبة">
+                    <i class="fa-solid fa-brain text-rose-400"></i>
+                    <span>صعوبات:</span>
+                    <span id="header-hard-count" class="font-black">0</span>
+                </button>
+
+                <!-- XP Badge -->
+                <div class="flex items-center gap-1.5 bg-slate-900/85 border border-neonGold/35 px-3 py-1.5 rounded-full shadow-inner" title="مجموع النقاط المكتسبة">
+                    <i class="fa-solid fa-star text-neonGold text-xs sm:text-sm animate-pulse"></i>
+                    <span id="header-xp" class="font-extrabold text-xs sm:text-sm text-neonGold">0</span>
+                    <span class="hidden sm:inline text-[11px] text-slate-400">نقطة</span>
+                </div>
+
+                <!-- Mastered Count -->
+                <div class="hidden md:flex items-center gap-1.5 bg-slate-900/85 border border-neonCyan/35 px-3 py-1.5 rounded-full" title="المصطلحات المحفوظة">
+                    <i class="fa-solid fa-check-double text-neonCyan text-sm"></i>
+                    <span id="header-mastered" class="font-extrabold text-sm text-neonCyan">0</span>
+                    <span class="text-[11px] text-slate-400">محفوظ</span>
+                </div>
+
+                <!-- Sound Toggle -->
+                <button id="sound-toggle" onclick="toggleSound()" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full glass flex items-center justify-center text-slate-200 hover:text-neonCyan hover:border-neonCyan/50 transition" title="تفعيل / كتم الصوت">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        <!-- ==================== VIEW 1: HOME DASHBOARD ==================== -->
+        <section id="view-home" class="space-y-8 animate-pop-in">
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl glass p-6 sm:p-9 overflow-hidden border border-white/15">
+                <div class="absolute -top-24 -left-24 w-72 h-72 bg-neonPurple/25 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-neonCyan/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                    <div class="space-y-4 text-center lg:text-right max-w-2xl">
+                        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2">
+                            <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neonCyan/10 border border-neonCyan/30 text-neonCyan text-xs sm:text-sm font-bold">
+                                <i class="fa-solid fa-bolt"></i>
+                                <span>السنة الثالثة ثانوي • المنهاج الكامل 100%</span>
+                            </span>
+                            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full solvix-badge text-white text-xs sm:text-sm font-black tracking-wider">
+                                <i class="fa-solid fa-code text-neonCyan"></i>
+                                <span>تطوير: SOLVIX0</span>
+                            </span>
+                        </div>
+
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight">
+                            احفظ <span class="text-gradient-main">التاريخ والجغرافيا والخرائط</span> بذكاء ومتعة!
+                        </h2>
+                        <p class="text-slate-300 text-sm sm:text-base font-tajawal leading-relaxed">
+                            قاعدة بيانات كاملة مستخرجة بدقة من جميع ملفات البكالوريا (الوحدات 1، 2، 3) مع خرائط تفاعلية وأساليب حفظ مبتكرة: كشف الهوية بالتلميحات، الترتيب الزمني، التكرار المتباعد، وتحديد المواقع على الخريطة.
+                        </p>
+
+                        <!-- Quick Stats Pills -->
+                        <div class="flex flex-wrap justify-center lg:justify-start gap-2.5 pt-1">
+                            <div class="px-3.5 py-1.5 rounded-2xl bg-slate-900/80 border border-white/10 text-xs sm:text-sm">
+                                <span class="text-emerald-400 font-black" id="stat-geo-count">0</span> مصطلح جغرافيا
+                            </div>
+                            <div class="px-3.5 py-1.5 rounded-2xl bg-slate-900/80 border border-white/10 text-xs sm:text-sm">
+                                <span class="text-neonPurple font-black" id="stat-hist-count">0</span> مصطلح تاريخ
+                            </div>
+                            <div class="px-3.5 py-1.5 rounded-2xl bg-slate-900/80 border border-white/10 text-xs sm:text-sm">
+                                <span class="text-neonGold font-black" id="stat-char-count">0</span> شخصية تاريخية
+                            </div>
+                            <div class="px-3.5 py-1.5 rounded-2xl bg-slate-900/80 border border-white/10 text-xs sm:text-sm">
+                                <span class="text-neonPink font-black" id="stat-date-count">0</span> تاريخ ومعلم
+                            </div>
+                            <div class="px-3.5 py-1.5 rounded-2xl bg-slate-900/80 border border-white/10 text-xs sm:text-sm">
+                                <span class="text-neonBlue font-black">4</span> خرائط تفاعلية
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rank & Progress Card -->
+                    <div class="w-full lg:w-80 rounded-2xl bg-slate-900/90 border border-white/15 p-5 space-y-4 shadow-2xl">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-slate-400">رتبتك الحالية</span>
+                            <span id="user-rank-badge" class="px-3 py-0.5 rounded-full text-xs font-bold bg-neonGold/20 text-neonGold border border-neonGold/40">مبتدئ طموح 🎯</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-neonGold to-amber-600 flex items-center justify-center text-darkBg text-2xl shadow-lg">
+                                <i class="fa-solid fa-medal"></i>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-black text-white"><span id="dash-xp">0</span> <span class="text-xs font-normal text-slate-400">XP</span></div>
+                                <div class="text-xs text-slate-400 mt-0.5">أعلى سلسلة إجابات: <span id="dash-streak" class="text-neonCyan font-bold">0</span></div>
+                            </div>
+                        </div>
+                        <!-- Mastery Progress Bar -->
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-300">نسبة الحفظ الشاملة</span>
+                                <span id="mastery-percent" class="text-neonCyan font-bold">0%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+                                <div id="mastery-bar" class="h-full bg-gradient-to-r from-neonCyan to-neonPurple rounded-full transition-all duration-700" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 1: Category & Unit Filter Selection -->
+            <div class="glass rounded-3xl p-5 sm:p-6 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <h3 class="text-lg sm:text-xl font-bold flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-lg bg-neonCyan/20 text-neonCyan flex items-center justify-center text-sm font-black">1</span>
+                        حدد المحور والوحدة الدراسية
+                    </h3>
+                    <!-- Unit Filter Pills -->
+                    <div class="flex flex-wrap gap-2" id="unit-filters">
+                        <button onclick="setUnitFilter('all')" data-unit="all" class="unit-btn active px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-neonCyan text-darkBg transition">كل الوحدات</button>
+                        <button onclick="setUnitFilter('1')" data-unit="1" class="unit-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-800/90 text-slate-300 hover:bg-slate-700 transition">الوحدة الأولى</button>
+                        <button onclick="setUnitFilter('2')" data-unit="2" class="unit-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-800/90 text-slate-300 hover:bg-slate-700 transition">الوحدة الثانية</button>
+                        <button onclick="setUnitFilter('3')" data-unit="3" class="unit-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-800/90 text-slate-300 hover:bg-slate-700 transition">الوحدة الثالثة</button>
+                    </div>
+                </div>
+
+                <!-- Category Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4" id="category-cards">
+                    <button onclick="setCategory('all')" data-cat="all" class="cat-card active text-right p-4 rounded-2xl border-2 border-neonCyan bg-neonCyan/10 transition flex flex-col justify-between gap-2">
+                        <div class="flex items-center justify-between">
+                            <i class="fa-solid fa-layer-group text-xl text-neonCyan"></i>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-neonCyan/20 text-neonCyan font-bold" id="count-cat-all">0</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-white text-sm sm:text-base">الكل (شامل)</div>
+                            <div class="text-[11px] text-slate-400">مراجعة شاملة</div>
+                        </div>
+                    </button>
+
+                    <button onclick="setCategory('geo_terms')" data-cat="geo_terms" class="cat-card text-right p-4 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-emerald-400/50 transition flex flex-col justify-between gap-2">
+                        <div class="flex items-center justify-between">
+                            <i class="fa-solid fa-earth-africa text-xl text-emerald-400"></i>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 font-bold" id="count-cat-geo">0</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-white text-sm sm:text-base">مصطلحات الجغرافيا</div>
+                            <div class="text-[11px] text-slate-400">الوحدات 1، 2، 3</div>
+                        </div>
+                    </button>
+
+                    <button onclick="setCategory('hist_terms')" data-cat="hist_terms" class="cat-card text-right p-4 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-neonPurple/50 transition flex flex-col justify-between gap-2">
+                        <div class="flex items-center justify-between">
+                            <i class="fa-solid fa-landmark text-xl text-neonPurple"></i>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-neonPurple/20 text-purple-300 font-bold" id="count-cat-hist">0</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-white text-sm sm:text-base">مصطلحات التاريخ</div>
+                            <div class="text-[11px] text-slate-400">الوحدات 1، 2، 3</div>
+                        </div>
+                    </button>
+
+                    <button onclick="setCategory('characters')" data-cat="characters" class="cat-card text-right p-4 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-neonGold/50 transition flex flex-col justify-between gap-2">
+                        <div class="flex items-center justify-between">
+                            <i class="fa-solid fa-user-tie text-xl text-neonGold"></i>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-neonGold/20 text-amber-300 font-bold" id="count-cat-char">0</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-white text-sm sm:text-base">شخصيات التاريخ</div>
+                            <div class="text-[11px] text-slate-400">49 شخصية مقررة</div>
+                        </div>
+                    </button>
+
+                    <button onclick="setCategory('dates')" data-cat="dates" class="cat-card text-right p-4 rounded-2xl border border-white/10 bg-slate-900/60 hover:border-neonPink/50 transition flex flex-col justify-between gap-2 col-span-2 sm:col-span-1">
+                        <div class="flex items-center justify-between">
+                            <i class="fa-solid fa-calendar-days text-xl text-neonPink"></i>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-neonPink/20 text-pink-300 font-bold" id="count-cat-date">0</span>
+                        </div>
+                        <div>
+                            <div class="font-bold text-white text-sm sm:text-base">تواريخ ومعالم</div>
+                            <div class="text-[11px] text-slate-400">كل التواريخ المقررة</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Innovative Game & Study Modes -->
+            <div class="space-y-4">
+                <h3 class="text-lg sm:text-xl font-bold flex items-center gap-2 px-1">
+                    <span class="w-7 h-7 rounded-lg bg-neonPurple/20 text-neonPurple flex items-center justify-center text-sm font-black">2</span>
+                    اختر أسلوب اللعب والحفظ المبتكر
+                </h3>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <!-- Mode 1: Interactive Maps & Pin-Drop Challenge -->
+                    <div onclick="startMapsMode()" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group relative overflow-hidden border-neonBlue/30">
+                        <div class="absolute top-0 left-0 w-24 h-24 bg-neonBlue/15 rounded-br-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div class="space-y-3.5 relative z-10">
+                            <div class="flex items-center justify-between">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-neonBlue to-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-map-location-dot"></i>
+                                </div>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-neonBlue/20 text-neonBlue border border-neonBlue/40">جديد ومميز</span>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-extrabold text-white group-hover:text-neonBlue transition">الخرائط التفاعلية وتحدي المواقع</h4>
+                                <p class="text-xs text-slate-400 mt-1.5 font-tajawal leading-relaxed">
+                                    استكشف خرائط العالم، الحرب الباردة، الثورة الجزائرية، والبرازيل، واختبر قدرتك على تحديد المواقع بدقة!
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pt-5 flex items-center justify-between text-neonBlue font-bold text-sm">
+                            <span>افتح الخرائط</span>
+                            <i class="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 2: Identity Detective (Progressive Clues) -->
+                    <div onclick="startDetectiveMode()" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-24 h-24 bg-amber-500/15 rounded-br-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div class="space-y-3.5 relative z-10">
+                            <div class="flex items-center justify-between">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-neonGold to-orange-600 flex items-center justify-center text-darkBg text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-user-secret"></i>
+                                </div>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-neonGold/20 text-neonGold border border-neonGold/40">أسلوب ذكي</span>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-extrabold text-white group-hover:text-neonGold transition">كشف الهوية بالتلميحات</h4>
+                                <p class="text-xs text-slate-400 mt-1.5 font-tajawal leading-relaxed">
+                                    تعرّف على الشخصية أو المصطلح عبر 3 تلميحات متدرجة! كلما كشفت الإجابة بتلميحات أقل تضاعفت نقاطك.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pt-5 flex items-center justify-between text-neonGold font-bold text-sm">
+                            <span>ابدأ التحقيق</span>
+                            <i class="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 3: Timeline Chronology Builder -->
+                    <div onclick="startTimelineMode()" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-24 h-24 bg-neonPink/15 rounded-br-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div class="space-y-3.5 relative z-10">
+                            <div class="flex items-center justify-between">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-neonPink to-rose-600 flex items-center justify-center text-white text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-timeline"></i>
+                                </div>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-neonPink/20 text-neonPink border border-neonPink/40">حفظ التواريخ</span>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-extrabold text-white group-hover:text-neonPink transition">تحدي الخط الزمني</h4>
+                                <p class="text-xs text-slate-400 mt-1.5 font-tajawal leading-relaxed">
+                                    رتّب 5 أحداث تاريخية من الأقدم إلى الأحدث لبناء التسلسل الزمني الصحيح وترسيخ التواريخ في الذاكرة.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pt-5 flex items-center justify-between text-neonPink font-bold text-sm">
+                            <span>رتب الأحداث</span>
+                            <i class="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 4: Speed Quiz Challenge -->
+                    <div onclick="startQuizMode()" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-24 h-24 bg-neonCyan/15 rounded-br-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div class="space-y-3.5 relative z-10">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-neonCyan to-teal-600 flex items-center justify-center text-darkBg text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-extrabold text-white group-hover:text-neonCyan transition">التحدي السريع (Quiz)</h4>
+                                <p class="text-xs text-slate-400 mt-1.5 font-tajawal leading-relaxed">
+                                    10 أسئلة متنوعة بمؤقت زمني ونظام مضاعفة النقاط (Combo) مع مؤثرات احتفالية.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pt-5 flex items-center justify-between text-neonCyan font-bold text-sm">
+                            <span>ابدأ الاختبار</span>
+                            <i class="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 5: 3D Spaced Repetition Flashcards -->
+                    <div onclick="startFlashcardsMode(false)" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-24 h-24 bg-neonPurple/15 rounded-br-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div class="space-y-3.5 relative z-10">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-neonPurple to-violet-700 flex items-center justify-center text-white text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-clone"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-extrabold text-white group-hover:text-neonPurple transition">البطاقات الذكية 3D</h4>
+                                <p class="text-xs text-slate-400 mt-1.5 font-tajawal leading-relaxed">
+                                    بطاقات قابلة للقلب بتقنية التكرار المتباعد: صنّف البطاقة كـ "محفوظة" أو "صعبة" للتركيز عليها لاحقاً.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pt-5 flex items-center justify-between text-neonPurple font-bold text-sm">
+                            <span>تصفح البطاقات</span>
+                            <i class="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 6: Memory Match Grid -->
+                    <div onclick="startMatchMode()" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-24 h-24 bg-emerald-500/15 rounded-br-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div class="space-y-3.5 relative z-10">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-darkBg text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-puzzle-piece"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-extrabold text-white group-hover:text-emerald-400 transition">لعبة المطابقة والربط</h4>
+                                <p class="text-xs text-slate-400 mt-1.5 font-tajawal leading-relaxed">
+                                    اربط كل مصطلح أو شخصية أو تاريخ بتعريفه الصحيح في أسرع وقت ممكن لتنشيط الذاكرة البصرية.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pt-5 flex items-center justify-between text-emerald-400 font-bold text-sm">
+                            <span>العب المطابقة</span>
+                            <i class="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 7: Difficult Cards Review -->
+                    <div onclick="startSpacedRepetitionMode()" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-24 h-24 bg-rose-500/15 rounded-br-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div class="space-y-3.5 relative z-10">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-red-700 flex items-center justify-center text-white text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-fire-flame-curved"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-extrabold text-white group-hover:text-rose-400 transition">مراجعة الصعوبات المركّزة</h4>
+                                <p class="text-xs text-slate-400 mt-1.5 font-tajawal leading-relaxed">
+                                    حقيبة ذكية تجمع تلقائياً كل المصطلحات والتواريخ التي أخطأت فيها أو حددتها كصعبة لإتقانها.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pt-5 flex items-center justify-between text-rose-400 font-bold text-sm">
+                            <span>راجع الصعوبات (<span id="card-hard-count">0</span>)</span>
+                            <i class="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 8: Complete Encyclopedia -->
+                    <div onclick="startExplorerMode()" class="glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between group relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-24 h-24 bg-indigo-500/15 rounded-br-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div class="space-y-3.5 relative z-10">
+                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-400 to-blue-700 flex items-center justify-center text-white text-2xl shadow-lg group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-extrabold text-white group-hover:text-indigo-400 transition">الموسوعة الشاملة والبحث</h4>
+                                <p class="text-xs text-slate-400 mt-1.5 font-tajawal leading-relaxed">
+                                    تصفح وابحث في جميع البيانات المستخرجة من الملفات الأربعة مرتبة حسب المادة والوحدة.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="pt-5 flex items-center justify-between text-indigo-400 font-bold text-sm">
+                            <span>افتح الموسوعة</span>
+                            <i class="fa-solid fa-arrow-left group-hover:-translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 2: INTERACTIVE MAPS & PIN-DROP CHALLENGE ==================== -->
+        <section id="view-maps" class="hidden space-y-6 animate-pop-in">
+            <!-- Map Selection & Mode Toggle Bar -->
+            <div class="glass rounded-3xl p-4 sm:p-6 space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-black text-gradient-main flex items-center gap-2">
+                            <i class="fa-solid fa-map-location-dot text-neonBlue"></i>
+                            الخرائط التفاعلية وتحدي تحديد المواقع
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-400 font-tajawal mt-1">اختر الخريطة ثم بدّل بين وضع "الاستكشاف" أو وضع "الاختبار على الخريطة"</p>
+                    </div>
+
+                    <!-- Explore vs Quiz Switch -->
+                    <div class="flex items-center gap-2 bg-slate-900/90 p-1.5 rounded-2xl border border-white/10 self-start">
+                        <button id="map-mode-explore-btn" onclick="setMapPlayMode('explore')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-neonBlue text-darkBg transition">
+                            <i class="fa-solid fa-compass ml-1"></i> وضع الاستكشاف
+                        </button>
+                        <button id="map-mode-quiz-btn" onclick="setMapPlayMode('quiz')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-slate-300 hover:text-white transition">
+                            <i class="fa-solid fa-crosshairs ml-1"></i> تحدي أين يقع؟
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 Map Tabs -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+                    <button onclick="selectMap('world_econ')" data-map="world_econ" class="map-tab-btn active p-3 rounded-2xl border-2 border-neonBlue bg-neonBlue/15 text-right transition">
+                        <div class="text-xs font-black text-neonBlue">خريطة 1 • جغرافيا</div>
+                        <div class="text-sm font-bold text-white mt-0.5">عالم الشمال والجنوب والتنينات</div>
+                    </button>
+                    <button onclick="selectMap('cold_war')" data-map="cold_war" class="map-tab-btn p-3 rounded-2xl border border-white/10 bg-slate-900/70 text-right hover:border-neonPurple/50 transition">
+                        <div class="text-xs font-black text-neonPurple">خريطة 2 • تاريخ و1</div>
+                        <div class="text-sm font-bold text-white mt-0.5">الأحلاف وأزمات الحرب الباردة</div>
+                    </button>
+                    <button onclick="selectMap('algeria_rev')" data-map="algeria_rev" class="map-tab-btn p-3 rounded-2xl border border-white/10 bg-slate-900/70 text-right hover:border-emerald-400/50 transition">
+                        <div class="text-xs font-black text-emerald-400">خريطة 3 • تاريخ و2</div>
+                        <div class="text-sm font-bold text-white mt-0.5">الولايات التاريخية وخطا شال وموريس</div>
+                    </button>
+                    <button onclick="selectMap('brazil_econ')" data-map="brazil_econ" class="map-tab-btn p-3 rounded-2xl border border-white/10 bg-slate-900/70 text-right hover:border-neonGold/50 transition">
+                        <div class="text-xs font-black text-neonGold">خريطة 4 • جغرافيا و3</div>
+                        <div class="text-sm font-bold text-white mt-0.5">البرازيل: المثلث الحيوي والأمازون</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Map Quiz Prompt Banner (Shown only in quiz mode) -->
+            <div id="map-quiz-banner" class="hidden glass rounded-2xl p-4 border-2 border-neonGold/50 bg-neonGold/10 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-neonGold text-darkBg flex items-center justify-center font-black text-lg shrink-0 animate-bounce">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs text-neonGold font-bold">انقر على الدبوس الصحيح فوق الخريطة:</div>
+                        <div id="map-quiz-target-text" class="text-base sm:text-lg font-black text-white">أين يقع مقر منظمة الأوبيك (فيينا)؟</div>
+                    </div>
+                </div>
+                <div class="text-xs sm:text-sm font-bold text-slate-300">
+                    نقاط الخرائط: <span id="map-quiz-score" class="text-neonCyan font-black text-base">0</span>
+                </div>
+            </div>
+
+            <!-- Main Interactive SVG Map + Details Panel -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- SVG Canvas Area -->
+                <div class="lg:col-span-2 glass rounded-3xl p-4 sm:p-6 border border-white/15 flex flex-col justify-between">
+                    <div id="svg-map-container" class="w-full rounded-2xl bg-[#081226] border border-white/10 overflow-hidden relative shadow-inner">
+                        <!-- Custom SVG Map injected dynamically -->
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 pt-3 px-1">
+                        <span><i class="fa-solid fa-hand-pointer text-neonCyan ml-1"></i> انقر على أي نقطة مضيئة لعرض التفاصيل الجغرافية والتاريخية</span>
+                        <span class="font-bold text-neonCyan/80">SOLVIX0 MAPS</span>
+                    </div>
+                </div>
+
+                <!-- Info Card Panel -->
+                <div class="glass rounded-3xl p-6 border border-white/15 flex flex-col justify-between space-y-4">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span id="map-info-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-neonBlue/20 text-neonBlue">بطاقة معلم جغرافي</span>
+                            <i class="fa-solid fa-map-pin text-neonPink text-xl"></i>
+                        </div>
+                        <h3 id="map-info-title" class="text-2xl font-black text-white">اختر موقعاً على الخريطة</h3>
+                        <p id="map-info-desc" class="text-sm text-slate-300 font-tajawal leading-relaxed">
+                            انقر على أي دائرة متوهجة على الخريطة المجاورة لاستعراض شرحها الكامل كما ورد في مقررات البكالوريا.
+                        </p>
+                        <div id="map-info-extra" class="p-3.5 rounded-2xl bg-slate-900/80 border border-white/10 text-xs text-neonCyan font-bold hidden"></div>
+                    </div>
+
+                    <!-- Quick List of Locations on Current Map -->
+                    <div class="space-y-2 pt-3 border-t border-white/10">
+                        <div class="text-xs font-bold text-slate-400">المعالم المدرجة في هذه الخريطة:</div>
+                        <div id="map-locations-pills" class="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 3: IDENTITY DETECTIVE (PROGRESSIVE CLUES) ==================== -->
+        <section id="view-detective" class="hidden max-w-3xl mx-auto space-y-6 animate-pop-in">
+            <div class="glass rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-9 h-9 rounded-xl bg-neonGold/20 text-neonGold flex items-center justify-center"><i class="fa-solid fa-user-secret"></i></span>
+                    <div>
+                        <h3 class="font-black text-white text-base sm:text-lg">كشف الهوية بالتلميحات</h3>
+                        <p class="text-[11px] text-slate-400">تلميح 1 = 30 نقطة • تلميح 2 = 20 نقطة • تلميح 3 = 10 نقاط</p>
+                    </div>
+                </div>
+                <div class="px-3.5 py-1.5 rounded-xl bg-slate-900/85 border border-neonGold/35 text-sm font-bold text-neonGold">
+                    الجائزة المتاحة: <span id="detective-potential-xp" class="font-black text-lg">30</span> نقطة
+                </div>
+            </div>
+
+            <div class="glass rounded-3xl p-6 sm:p-8 space-y-6 border border-white/15">
+                <div class="flex items-center justify-between">
+                    <span id="detective-cat-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-neonPurple/20 text-purple-300">شخصية تاريخية</span>
+                    <span class="text-xs text-slate-400">التلميحات المكشوفة: <span id="detective-clue-count" class="text-neonGold font-bold">1</span> / 3</span>
+                </div>
+
+                <!-- Clues List -->
+                <div id="detective-clues-list" class="space-y-3">
+                    <!-- Dynamic Clues -->
+                </div>
+
+                <!-- Reveal Next Clue Button -->
+                <div class="flex justify-center">
+                    <button id="detective-next-clue-btn" onclick="revealNextDetectiveClue()" class="px-5 py-2.5 rounded-xl bg-neonGold/15 border border-neonGold/40 text-neonGold hover:bg-neonGold/25 text-xs sm:text-sm font-extrabold transition flex items-center gap-2">
+                        <i class="fa-solid fa-lightbulb"></i>
+                        <span>اكشف التلميح التالي (-10 نقاط من الجائزة)</span>
+                    </button>
+                </div>
+
+                <!-- 4 Choices -->
+                <div class="space-y-2.5 pt-2 border-t border-white/10">
+                    <div class="text-xs text-slate-400 font-bold">من أكون / ما هو المصطلح المقصود؟</div>
+                    <div id="detective-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+
+                <!-- Next Round Button -->
+                <div id="detective-next-round" class="hidden pt-3 flex justify-end">
+                    <button onclick="nextDetectiveRound()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-neonGold to-orange-500 text-darkBg font-black hover:opacity-90 transition">
+                        اللغز التالي <i class="fa-solid fa-arrow-left mr-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 4: TIMELINE CHRONOLOGY BUILDER ==================== -->
+        <section id="view-timeline" class="hidden max-w-4xl mx-auto space-y-6 animate-pop-in">
+            <div class="glass rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-9 h-9 rounded-xl bg-neonPink/20 text-neonPink flex items-center justify-center"><i class="fa-solid fa-timeline"></i></span>
+                    <div>
+                        <h3 class="font-black text-white text-base sm:text-lg">تحدي الخط الزمني (من الأقدم إلى الأحدث)</h3>
+                        <p class="text-[11px] text-slate-400">انقر على الأحداث بالترتيب الزمني الصحيح من أقدم حدث إلى أحدث حدث</p>
+                    </div>
+                </div>
+                <button onclick="startTimelineMode()" class="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold transition">
+                    <i class="fa-solid fa-rotate"></i> مجموعة أحداث جديدة
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Pool of Shuffled Events -->
+                <div class="glass rounded-3xl p-5 space-y-3 border border-white/10">
+                    <h4 class="text-sm font-extrabold text-neonPink flex items-center gap-2">
+                        <i class="fa-solid fa-shuffle"></i> الأحداث المبعثرة (انقر لاختيار الأقدم أولاً)
+                    </h4>
+                    <div id="timeline-pool" class="space-y-2.5"></div>
+                </div>
+
+                <!-- Ordered Timeline Slots -->
+                <div class="glass rounded-3xl p-5 space-y-3 border border-neonCyan/25">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-extrabold text-neonCyan flex items-center gap-2">
+                            <i class="fa-solid fa-arrow-down-1-9"></i> خطك الزمني المرتب
+                        </h4>
+                        <button onclick="resetTimelineSelection()" class="text-xs text-slate-400 hover:text-white underline">إعادة الترتيب</button>
+                    </div>
+                    <div id="timeline-ordered" class="space-y-2.5 min-h-[260px]"></div>
+
+                    <button id="timeline-check-btn" onclick="checkTimelineOrder()" disabled class="w-full py-3 rounded-2xl bg-gradient-to-r from-neonCyan to-neonBlue text-darkBg font-black disabled:opacity-40 transition">
+                        تحقق من صحة الترتيب الزمني
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 5: QUIZ MODE ==================== -->
+        <section id="view-quiz" class="hidden max-w-3xl mx-auto space-y-6 animate-pop-in">
+            <div class="glass rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-xl bg-neonCyan/15 text-neonCyan font-bold text-sm">
+                        السؤال <span id="quiz-q-num">1</span> / <span id="quiz-q-total">10</span>
+                    </span>
+                    <span id="quiz-streak-badge" class="hidden px-3 py-1 rounded-xl bg-neonGold/20 text-neonGold font-bold text-sm animate-bounce">
+                        🔥 سلسلة <span id="quiz-streak">0</span>x
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-stopwatch text-neonPink"></i>
+                    <span id="quiz-timer" class="font-black text-lg text-white w-8 text-center">25</span>
+                    <span class="text-xs text-slate-400">ثانية</span>
+                </div>
+
+                <div class="text-sm font-bold text-slate-300">
+                    نقاط الجولة: <span id="quiz-score" class="text-neonCyan text-base">0</span>
+                </div>
+            </div>
+
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                <div id="quiz-progress-bar" class="h-full bg-gradient-to-r from-neonCyan via-neonBlue to-neonPurple transition-all duration-300" style="width: 10%"></div>
+            </div>
+
+            <div id="quiz-card" class="glass rounded-3xl p-6 sm:p-8 space-y-6 border border-white/15">
+                <div class="flex items-center justify-between">
+                    <span id="quiz-category-tag" class="px-3 py-1 rounded-full text-xs font-bold bg-neonPurple/20 text-purple-300 border border-neonPurple/30">
+                        مصطلحات الجغرافيا • الوحدة 1
+                    </span>
+                    <span class="text-xs text-slate-400">اختر الإجابة الصحيحة</span>
+                </div>
+
+                <h3 id="quiz-question-text" class="text-xl sm:text-2xl font-extrabold text-white leading-relaxed">
+                    نص السؤال...
+                </h3>
+
+                <div id="quiz-options" class="space-y-3"></div>
+
+                <div id="quiz-feedback" class="hidden pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div id="quiz-feedback-msg" class="text-sm font-bold flex items-center gap-2"></div>
+                    <button onclick="nextQuizQuestion()" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-neonCyan to-neonBlue text-darkBg font-extrabold hover:opacity-90 transition flex items-center justify-center gap-2">
+                        <span>السؤال التالي</span>
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 6: QUIZ RESULTS ==================== -->
+        <section id="view-quiz-result" class="hidden max-w-2xl mx-auto text-center space-y-6 animate-pop-in">
+            <div class="glass rounded-3xl p-8 sm:p-10 space-y-6 border border-white/15 relative overflow-hidden">
+                <div class="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-tr from-neonGold to-amber-500 flex items-center justify-center text-darkBg text-5xl shadow-2xl animate-float">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+
+                <div class="space-y-2">
+                    <h2 id="result-title" class="text-3xl font-black text-gradient-gold">أداء أسطوري!</h2>
+                    <p id="result-subtitle" class="text-slate-300 text-sm sm:text-base font-tajawal">لقد أنهيت التحدي بنجاح باهر.</p>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 sm:gap-4 pt-2">
+                    <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10">
+                        <div class="text-xs text-slate-400">الإجابات الصحيحة</div>
+                        <div class="text-2xl font-black text-emerald-400 mt-1"><span id="res-correct">0</span>/10</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10">
+                        <div class="text-xs text-slate-400">النقاط المكتسبة</div>
+                        <div class="text-2xl font-black text-neonGold mt-1">+<span id="res-xp">0</span></div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10">
+                        <div class="text-xs text-slate-400">نسبة الدقة</div>
+                        <div class="text-2xl font-black text-neonCyan mt-1"><span id="res-accuracy">0</span>%</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 pt-4">
+                    <button onclick="startQuizMode()" class="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-neonCyan to-neonBlue text-darkBg font-extrabold hover:opacity-90 transition">
+                        <i class="fa-solid fa-rotate-right ml-1"></i> تحدي جديد
+                    </button>
+                    <button onclick="navigateTo('home')" class="flex-1 py-3.5 rounded-2xl glass hover:bg-white/10 font-bold transition">
+                        <i class="fa-solid fa-house ml-1"></i> العودة للرئيسية
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 7: 3D FLASHCARDS MODE ==================== -->
+        <section id="view-flashcards" class="hidden max-w-3xl mx-auto space-y-6 animate-pop-in">
+            <div class="glass rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span id="fc-mode-label" class="text-sm font-bold text-slate-300">البطاقة</span>
+                    <span class="px-3 py-1 rounded-xl bg-neonPurple/20 text-neonPurple font-extrabold text-sm">
+                        <span id="fc-current">1</span> / <span id="fc-total">0</span>
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <label class="flex items-center gap-2 text-xs sm:text-sm text-slate-300 cursor-pointer bg-slate-900/70 px-3 py-1.5 rounded-xl border border-white/10">
+                        <input type="checkbox" id="fc-hide-mastered" onchange="filterFlashcards()" class="accent-neonCyan rounded">
+                        <span>إخفاء المحفوظة</span>
+                    </label>
+                    <button onclick="shuffleFlashcards()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs sm:text-sm font-bold transition">
+                        <i class="fa-solid fa-shuffle text-neonCyan"></i> خلط
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3D Flip Card -->
+            <div class="perspective-1000 w-full h-80 sm:h-96 cursor-pointer" onclick="flipCard()">
+                <div id="flashcard-el" class="flip-card w-full h-full">
+                    <div class="flip-card-inner">
+                        <!-- Front -->
+                        <div class="flip-card-front glass border-2 border-neonPurple/40 p-6 sm:p-10 flex flex-col justify-between items-center text-center shadow-2xl">
+                            <div class="w-full flex items-center justify-between">
+                                <span id="fc-front-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-neonPurple/20 text-purple-300">مصطلح</span>
+                                <div class="flex items-center gap-2">
+                                    <span id="fc-hard-indicator" class="hidden text-xs font-bold text-rose-400"><i class="fa-solid fa-fire"></i> صعبة</span>
+                                    <span id="fc-mastered-indicator" class="hidden text-xs font-bold text-emerald-400"><i class="fa-solid fa-circle-check"></i> محفوظة</span>
+                                </div>
+                            </div>
+
+                            <div class="my-auto space-y-3">
+                                <div class="text-xs text-slate-400">المصطلح / الشخصية / التاريخ</div>
+                                <h2 id="fc-front-text" class="text-2xl sm:text-4xl font-black text-white leading-snug">
+                                    عالم الشمال
+                                </h2>
+                            </div>
+
+                            <div class="text-xs text-neonCyan flex items-center gap-2 animate-pulse">
+                                <i class="fa-solid fa-hand-pointer"></i>
+                                <span>انقر على البطاقة لقلبها ومعرفة الإجابة</span>
+                            </div>
+                        </div>
+
+                        <!-- Back -->
+                        <div class="flip-card-back glass border-2 border-neonCyan/50 bg-slate-900/95 p-6 sm:p-10 flex flex-col justify-between items-center text-center shadow-2xl">
+                            <div class="w-full flex items-center justify-between">
+                                <span class="text-xs font-bold text-neonCyan">الشرح والتعريف الكامل</span>
+                                <span id="fc-unit-badge" class="text-xs text-slate-400">الوحدة 1</span>
+                            </div>
+
+                            <div class="my-auto overflow-y-auto max-h-52 px-2">
+                                <p id="fc-back-text" class="text-base sm:text-xl font-bold text-slate-100 leading-relaxed font-tajawal">
+                                    التعريف...
+                                </p>
+                            </div>
+
+                            <div class="text-xs text-slate-400">
+                                <i class="fa-solid fa-rotate"></i> انقر للعودة للواجهة
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spaced Repetition Action Controls -->
+            <div class="flex flex-wrap items-center justify-between gap-2.5">
+                <button onclick="prevFlashcard()" class="px-4 py-3 rounded-2xl glass hover:bg-white/10 font-bold flex items-center justify-center gap-1.5 transition text-sm">
+                    <i class="fa-solid fa-chevron-right"></i> السابق
+                </button>
+
+                <button id="fc-toggle-hard-btn" onclick="toggleHardCurrentCard()" class="flex-1 sm:flex-none px-4 py-3 rounded-2xl bg-rose-500/20 border border-rose-500/50 text-rose-300 hover:bg-rose-500/30 font-extrabold flex items-center justify-center gap-2 transition text-xs sm:text-sm">
+                    <i class="fa-solid fa-fire"></i>
+                    <span id="fc-hard-btn-text">تحتاج مراجعة (صعبة)</span>
+                </button>
+
+                <button id="fc-toggle-master-btn" onclick="toggleMasterCurrentCard()" class="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/30 font-extrabold flex items-center justify-center gap-2 transition text-xs sm:text-sm">
+                    <i class="fa-solid fa-check"></i>
+                    <span id="fc-master-btn-text">حفظتها (أعرفها)</span>
+                </button>
+
+                <button onclick="nextFlashcard()" class="px-4 py-3 rounded-2xl glass hover:bg-white/10 font-bold flex items-center justify-center gap-1.5 transition text-sm">
+                    التالي <i class="fa-solid fa-chevron-left"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 8: MATCHING GAME MODE ==================== -->
+        <section id="view-match" class="hidden max-w-5xl mx-auto space-y-6 animate-pop-in">
+            <div class="glass rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <span class="font-extrabold text-emerald-400 text-lg"><i class="fa-solid fa-puzzle-piece ml-1"></i> تحدي المطابقة</span>
+                    <span class="text-xs sm:text-sm text-slate-400">اربط كل عنصر بتعريفه الصحيح</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-sm font-bold">
+                        المتطابقة: <span id="match-progress" class="text-neonCyan">0</span> / <span id="match-total">5</span>
+                    </div>
+                    <div class="text-sm font-bold">
+                        الوقت: <span id="match-timer" class="text-neonGold">0</span>ث
+                    </div>
+                    <button onclick="startMatchMode()" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold">
+                        <i class="fa-solid fa-rotate"></i> جولة جديدة
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold text-neonCyan uppercase tracking-wider px-2">المصطلح / الشخصية / التاريخ</h4>
+                    <div id="match-col-terms" class="space-y-3"></div>
+                </div>
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold text-neonPurple uppercase tracking-wider px-2">التعريف / الحدث / الإنجاز</h4>
+                    <div id="match-col-defs" class="space-y-3"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 9: ENCYCLOPEDIA EXPLORER ==================== -->
+        <section id="view-explorer" class="hidden space-y-6 animate-pop-in">
+            <div class="glass rounded-3xl p-5 space-y-4">
+                <div class="flex flex-col md:flex-row gap-4 justify-between">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="explorer-search" oninput="renderExplorer()" placeholder="ابحث عن أي مصطلح، شخصية، تاريخ أو حدث في الملفات..." class="w-full bg-slate-900/90 border border-white/15 rounded-2xl pr-11 pl-4 py-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-neonCyan transition">
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <select id="explorer-cat-filter" onchange="renderExplorer()" class="bg-slate-900/90 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neonCyan">
+                            <option value="all">جميع الأقسام</option>
+                            <option value="geo_terms">مصطلحات الجغرافيا</option>
+                            <option value="hist_terms">مصطلحات التاريخ</option>
+                            <option value="characters">شخصيات التاريخ</option>
+                            <option value="dates">تواريخ ومعالم</option>
+                        </select>
+                        <select id="explorer-unit-filter" onchange="renderExplorer()" class="bg-slate-900/90 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-neonCyan">
+                            <option value="all">جميع الوحدات</option>
+                            <option value="1">الوحدة الأولى</option>
+                            <option value="2">الوحدة الثانية</option>
+                            <option value="3">الوحدة الثالثة</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-400">
+                    عدد النتائج المعروضة: <span id="explorer-count" class="text-neonCyan font-bold">0</span> عنصر من قاعدة البيانات الكاملة
+                </div>
+            </div>
+
+            <div id="explorer-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </section>
+
+    </main>
+
+    <!-- Prominent Footer Signed by SOLVIX0 -->
+    <footer class="mt-12 border-t border-white/10 glass py-5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+            <div class="flex items-center gap-2 text-slate-300">
+                <i class="fa-solid fa-graduation-cap text-neonCyan"></i>
+                <span>منصة التحضير الذكي لبكالوريا التاريخ والجغرافيا • السنة الثالثة ثانوي</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-1.5 rounded-full solvix-badge shadow-lg">
+                <span class="text-slate-300">تصميم وبرمجة:</span>
+                <span class="font-black tracking-widest text-gradient-main text-sm sm:text-base">SOLVIX0</span>
+                <i class="fa-solid fa-sparkles text-neonGold text-xs"></i>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Toast Notification -->
+    <div id="toast-box" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform translate-y-4">
+        <div class="glass px-6 py-3 rounded-2xl border border-neonCyan/50 shadow-2xl flex items-center gap-3 text-sm font-bold text-white">
+            <i id="toast-icon" class="fa-solid fa-circle-info text-neonCyan text-lg"></i>
+            <span id="toast-text">رسالة تنبيه</span>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // 1. EXHAUSTIVE CURRICULUM DATASET (ALL 4 PDF FILES - UNITS 1, 2, 3)
+        // =========================================================================
+        const CURRICULUM_DATA = [
+            // ================= GEOGRAPHY TERMS: UNIT 1 =================
+            { id: 'g1_1', cat: 'geo_terms', unit: '1', term: 'عالم الشمال', def: 'يقصد به العالم المتطور الواقع في النصف الشمالي للكرة الأرضية، ويضم الو م أ وكندا وأوروبا وروسيا واليابان إضافة إلى نيوزيلندا وأستراليا في جنوب الكرة الأرضية.' },
+            { id: 'g1_2', cat: 'geo_terms', unit: '1', term: 'عالم الجنوب', def: 'يقصد به العالم المتخلف السائر في طريق النمو، والذي يقع معظمه في النصف الجنوبي للكرة الأرضية بقارة آسيا وإفريقيا وأمريكا اللاتينية، مشكل من دول تعاني التخلف والتبعية.' },
+            { id: 'g1_3', cat: 'geo_terms', unit: '1', term: 'العالم الثالث', def: 'يقصد به الدول المستقلة حديثا والسائرة في طريق النمو، وأول من استعمل هذا المصطلح العالم الفرنسي الاقتصادي ألفريد صوفي سنة 1952م.' },
+            { id: 'g1_4', cat: 'geo_terms', unit: '1', term: 'تبييض الأموال', def: 'يقصد بها عملية غسيل الأموال، أي تحويل أموال مكتسبة بطريقة غير شرعية (مثل أموال المخدرات والأسلحة والإرهاب) إلى أموال شرعية عن طريق استثمارات تجارية وعقارية.' },
+            { id: 'g1_5', cat: 'geo_terms', unit: '1', term: 'اتفاقية لومي', def: 'اتفاقية موقعة سنة 1975م بين الاتحاد الأوروبي وبعض الدول الإفريقية وبعض جزر الكاريبي والمحيط الهادي (46 دولة)، تمنح للصادرات الإفريقية إلى الاتحاد الأوروبي مزايا منها إعفاء من الرسوم الجمركية، انتهى العمل بها سنة 2000م وعوضت باتفاقيات أخرى.' },
+            { id: 'g1_6', cat: 'geo_terms', unit: '1', term: 'مجموعة التبادل الحر ALENA', def: 'اتفاقية تجمع الولايات المتحدة الأمريكية وكندا والمكسيك، تقضي بنزع الرسوم الجمركية بين هذه الدول بداية من سنة 1994م، وذلك بغية تعزيز التبادل التجاري بينها.' },
+            { id: 'g1_7', cat: 'geo_terms', unit: '1', term: 'التنمية', def: 'مصطلح اقتصادي يعني مجموع الإجراءات والمشاريع التي تهدف إلى تحقيق التطور الاقتصادي والرفاهية الاجتماعية.' },
+            { id: 'g1_8', cat: 'geo_terms', unit: '1', term: 'المؤشر', def: 'عبارة عن رقم إحصائي يمثل ظاهرة معينة خلال فترة زمنية.' },
+            { id: 'g1_9', cat: 'geo_terms', unit: '1', term: 'التقدم', def: 'القدرة على الاستغلال العقلاني للموارد المادية والبشرية من أجل تحقيق التطور في جميع الميادين دون استثناء، بغية تحسين معيشة المواطن وتلبية حاجياته المختلفة.' },
+            { id: 'g1_10', cat: 'geo_terms', unit: '1', term: 'التخلف', def: 'ظاهرة تميز البلدان التي تعاني من ضعف النمو الاقتصادي وبطء التنمية وعدم تحكمها في التكنولوجيات الحديثة والمتطورة بسبب عدم القدرة على الاستغلال العقلاني للموارد المادية والبشرية.' },
+            { id: 'g1_11', cat: 'geo_terms', unit: '1', term: 'المعيار', def: 'أداة أو وسيلة تسمح بالإشارة أو الدلالة على وضعية معينة (يعبر عنه كذلك بأنه قيمة أو إشارة رقمية تسمح بتقييم حالة أو وضعية مجال اقتصادي معين).' },
+            { id: 'g1_12', cat: 'geo_terms', unit: '1', term: 'رؤوس الأموال', def: 'الموارد المالية التي يمكن استخدامها في مجالات التنمية والاستثمار، ويتحقق رأس المال من الفوائد والأرباح الناتجة عن الاستثمارات الناجحة.' },
+            { id: 'g1_13', cat: 'geo_terms', unit: '1', term: 'الاستثمارات', def: 'تمثل مجموع الأموال المنفقة لغرض إنماء رأس المال، بمعنى توظيف المال في مشاريع مربحة تعود بالفائدة على صاحبها.' },
+            { id: 'g1_14', cat: 'geo_terms', unit: '1', term: 'البورصة', def: 'سوق مالية تخضع لقانون السوق، يتم فيها تداول العملات والسندات والأسهم، كما يتم فيها تحديد أسعار المواد الأولية، أهمها بورصة وول ستريت وبورصة لندن وباريس وطوكيو.' },
+            { id: 'g1_15', cat: 'geo_terms', unit: '1', term: 'السندات', def: 'أوراق مالية ذات قيمة معلومة، يقدمها المستثمرون إلى المؤسسات والحكومات أو الأشخاص مقابل فوائد معلومة ولفترات زمنية معلومة غالبا ما تكون طويلة قد تصل 30 سنة.' },
+            { id: 'g1_16', cat: 'geo_terms', unit: '1', term: 'الأسهم', def: 'تمثل ملكية في شركة "حصة" وهي أوراق تحمل قيمة نقدية متغيرة في القيمة بمرور الوقت، والأسهم تكون عرضة لتقلبات سعرية ويتم تداولها في السوق كأي سلعة تخضع للعرض والطلب.' },
+            { id: 'g1_17', cat: 'geo_terms', unit: '1', term: 'العملة والعملة الصعبة', def: 'الشكل القانوني للنقد المتداول وتشمل النقود المعدنية والورقية، ويطلق تعبير العملة الصعبة الذي أصبح مرادفا للدولار الأمريكي على كل العملات القابلة للتحويل إلى الدولار.' },
+            { id: 'g1_18', cat: 'geo_terms', unit: '1', term: 'الإشهار والدعاية', def: 'عملية تهدف إلى ترويج سلعة أو خدمة عن طريق وسائل الإعلام والاتصال، لتعرض فيه إعلاناتها التجارية بغية التعريف بالسلع والخدمات وترويجها.' },
+            { id: 'g1_19', cat: 'geo_terms', unit: '1', term: 'العولمة', def: 'تعني الشمولية، أي عالمية السوق إنتاجا واستهلاكا على حد سواء، وبتعبير أوسع هي تحول الكون إلى قرية صغيرة يسيرها نمط اقتصادي وسياسي وثقافي موحد.' },
+            { id: 'g1_20', cat: 'geo_terms', unit: '1', term: 'منظمة الأوبيك OPEC', def: 'منظمة الدول المصدرة للنفط، تأسست في 10 سبتمبر 1960م ببغداد، وتضم حاليا 13 دولة، مقرها فيينا عاصمة النمسا (بالفرنسية OPEP).' },
+            { id: 'g1_21', cat: 'geo_terms', unit: '1', term: 'الشركات المتعددة الجنسيات', def: 'شركات عملاقة ذات رؤوس أموال طائلة، لها فروع في مختلف أنحاء العالم وتشغل عشرات الآلاف من العمال مثل: شركة توتال الفرنسية وجنرال موتورز الأمريكية.' },
+            { id: 'g1_22', cat: 'geo_terms', unit: '1', term: 'المنظمة العالمية للتجارة OMC', def: 'منظمة دولية تأسست سنة 1995م على أنقاض الغات GATT، تعمل على تحرير التجارة العالمية برفع الحواجز الجمركية (ضمت 151 بلدا عام 2007م).' },
+            { id: 'g1_23', cat: 'geo_terms', unit: '1', term: 'صندوق النقد الدولي FMI', def: 'مؤسسة مالية دولية تأسست في 27 ديسمبر 1945م مقره واشنطن، يعمل على تسيير النظام النقدي الدولي منذ ح ع 2.' },
+            { id: 'g1_24', cat: 'geo_terms', unit: '1', term: 'البنك العالمي', def: 'أنشئ في 25 جوان 1946م يتكون من عدة مؤسسات مالية، من مهامه تقديم القروض للدول وخاصة النامية قصد تمويل المشاريع التنموية والمساعدات التقنية.' },
+            { id: 'g1_25', cat: 'geo_terms', unit: '1', term: 'البنوك (المصارف)', def: 'مؤسسات مالية مختصة في استثمار الأموال وتشغيلها وإقراضها إلى المستثمرين بفوائد متغيرة حسب طبيعة القرض ومدة الاقتراض.' },
+            { id: 'g1_26', cat: 'geo_terms', unit: '1', term: 'اقتصاد السوق', def: 'نظام اقتصادي يقوم على قانون السوق (العرض والطلب) وعلى المبادرة الحرة والتنافس بين المؤسسات والشركات.' },
+            { id: 'g1_27', cat: 'geo_terms', unit: '1', term: 'الأسواق العالمية', def: 'مناطق التبادل التجاري والتي تعرف حركة كثيفة في الاستيراد والتصدير ومختلف الأنشطة التجارية.' },
+            { id: 'g1_28', cat: 'geo_terms', unit: '1', term: 'مجموعة الثمانية G8', def: 'الدول الأكثر تصنيعا وغنى في العالم (فرنسا، ألمانيا، إيطاليا، بريطانيا، الولايات المتحدة، كندا، اليابان، روسيا).' },
+            { id: 'g1_29', cat: 'geo_terms', unit: '1', term: 'مؤشر التنمية البشرية IDH', def: 'مقياس تأليفي تتراوح قيمته من 0 إلى 1 يعتمد لقياس درجة تقدم الأقطار يتألف من أمل الحياة عند الولادة ونسبة التمدرس والدخل الفردي.' },
+            { id: 'g1_30', cat: 'geo_terms', unit: '1', term: 'التكتلات الاقتصادية', def: 'معاهدات في المجال الاقتصادي تهدف لتوحيد الجهود بين مجموعة من الدول أو الشركات الكبرى، بهدف تشكيل قوة اقتصادية ومواجهة التحديات، من أهمها الاتحاد الأوروبي.' },
+            { id: 'g1_31', cat: 'geo_terms', unit: '1', term: 'الناتج الداخلي الخام PIB', def: 'قيمة ما تنتجه مختلف القطاعات الاقتصادية داخل البلد الواحد خلال سنة محسوب بالدولار PIB، ويعرف أيضا بالدخل المحلي الخام.' },
+            { id: 'g1_32', cat: 'geo_terms', unit: '1', term: 'الناتج الداخلي الخام للفرد', def: '(الدخل الفردي) حاصل قسمة الناتج الداخلي الخام على عدد السكان وهو مقياس نسبي ويكون إما مرتفعا أو منخفضا حسب تغير عدد السكان ويعبر عنه بالدولار.' },
+            { id: 'g1_33', cat: 'geo_terms', unit: '1', term: 'الناتج الوطني الخام PNB', def: '(الدخل الوطني الخام) الثروة المنتجة داخل وخارج البلد خلال سنة محسوب بالدولار PNB.' },
+            { id: 'g1_34', cat: 'geo_terms', unit: '1', term: 'التجارة الإلكترونية', def: 'تعرف بالاقتصاد الرقمي أي البيع والشراء عن طريق شبكة الإنترنت.' },
+            { id: 'g1_35', cat: 'geo_terms', unit: '1', term: 'الليبرالية', def: 'مذهب اقتصادي واجتماعي يرتكز على مبدأ الحرية المطلقة، ويرفض أي تدخل للدولة في الشؤون الاقتصادية وهو قمة النظام الرأسمالي.' },
+            { id: 'g1_36', cat: 'geo_terms', unit: '1', term: 'المبادلات', def: 'يقصد بها حركة تبادل السلع والخدمات ورؤوس الأموال بين الدول (الصادرات والواردات).' },
+            { id: 'g1_37', cat: 'geo_terms', unit: '1', term: 'البرميل النفطي', def: 'وحدة تساوي 158.97 لتر من البترول الخام بغية توحيد التعاملات التجارية العالمية من هذه المادة.' },
+            { id: 'g1_38', cat: 'geo_terms', unit: '1', term: 'التدفقات', def: 'يقصد بها حركة السكان ورؤوس الأموال والاستثمارات من مناطق الندرة إلى مناطق الوفرة (توفر شروط الحياة الكريمة والاستثمار المربح).' },
+            { id: 'g1_39', cat: 'geo_terms', unit: '1', term: 'البنية التحتية (هياكل قاعدية)', def: 'جملة التجهيزات الضرورية لتنشيط الحركية الاقتصادية، مثل الطرقات والسكك الحديدية والموانئ والمطارات والجسور والمعاهد والجامعات والمستشفيات.' },
+
+            // ================= GEOGRAPHY TERMS: UNIT 2 =================
+            { id: 'g2_1', cat: 'geo_terms', unit: '2', term: 'تنظيم الإقليم', def: 'هيكلة للمظاهر الجغرافية والبشرية والاقتصادية على مستوى الإقليم، بوضع خطط لتوفير جميع الاحتياجات تأخذ بعين الاعتبار الإمكانيات الطبيعية البشرية والاقتصادية التي يتوفر عليها الإقليم.' },
+            { id: 'g2_2', cat: 'geo_terms', unit: '2', term: 'الهيمنة والنفوذ', def: 'السيطرة والاستغلال التي تمارسها الدول القوية ذات الإمكانيات الضخمة على الدول الضعيفة وعلى المؤسسات السياسية والمالية العالمية.' },
+            { id: 'g2_3', cat: 'geo_terms', unit: '2', term: 'الاستقطاب', def: 'عملية جذب للأموال والأفراد والشركات نحو دولة أو منطقة أو مدينة ما، بسبب الفوائد والخدمات والضمانات والحماية الممنوحة والاستقرار السياسي والأمني.' },
+            { id: 'g2_4', cat: 'geo_terms', unit: '2', term: 'الدورة الزراعية', def: 'زراعة مجموعة محاصيل بتعاقب منظم لعدد من السنين طبقا لنظام معين يهدف للاحتفاظ بخصوبة التربة وحماية موادها العضوية.' },
+            { id: 'g2_5', cat: 'geo_terms', unit: '2', term: 'النطاقات الزراعية', def: 'تخصيص مساحة زراعية شاسعة جدا لإنتاج محصول واحد، وهي ميزة تتميز بها الزراعة في الولايات المتحدة الأمريكية (مثل نطاق الذرة ونطاق القمح) وتتطلب إمكانيات ضخمة.' },
+            { id: 'g2_6', cat: 'geo_terms', unit: '2', term: 'حزام الشمس', def: 'تسمية أطلقت على الولايات الجنوبية والغربية للولايات المتحدة الأمريكية نظرا للحرارة العالية والحركية الاقتصادية وخاصة التكنولوجيات المعقدة.' },
+            { id: 'g2_7', cat: 'geo_terms', unit: '2', term: 'الاتحاد', def: 'مصطلح يقصد به أعلى درجات التعاون والتنسيق والتكامل، إلى درجة انصهار الخصوصيات والفوارق بين مجموعة دول في إقليم أو قارة واحدة في الميادين السياسية والاقتصادية والاجتماعية كالاتحاد الأوروبي.' },
+            { id: 'g2_8', cat: 'geo_terms', unit: '2', term: 'التكتل', def: 'توحيد لكل الإمكانيات المتوفرة في دولتين أو أكثر بغية تشكيل قوة قد يكون تكتل سياسي أو اقتصادي أو عسكري.' },
+            { id: 'g2_9', cat: 'geo_terms', unit: '2', term: 'تنظيم المجال', def: 'وضع خطط عملية لإصلاح مجال أو إقليم ما، مع الأخذ بعين الاعتبار الظروف الطبيعية والموارد البشرية والاقتصادية التي يتوفر عليها والاحتياجات.' },
+            { id: 'g2_10', cat: 'geo_terms', unit: '2', term: 'معاهدة روما (1957)', def: 'معاهدة موقعة في 25 مارس 1957م بروما الإيطالية من قبل (فرنسا، إيطاليا، ألمانيا الغربية، بلجيكا، لوكسمبورغ، هولندا) تنص على إنشاء السوق الأوروبية المشتركة ومقرها بروكسل.' },
+            { id: 'g2_11', cat: 'geo_terms', unit: '2', term: 'البنلوكس BENELUX', def: 'اتحاد اقتصادي تأسس عام 1944 بين ثلاث ممالك في أوروبا وهم بلجيكا وهولندا ولوكسمبورغ، ومنه جاءت فكرة إنشاء السوق الأوروبية المشتركة سنة 1957م.' },
+            { id: 'g2_12', cat: 'geo_terms', unit: '2', term: 'الأراضي المنخفضة', def: 'مملكة الأراضي المنخفضة هو الاسم الرسمي لهولندا، سميت كذلك لأن حوالي نصف أراضيها تقع تحت مستوى سطح البحر.' },
+            { id: 'g2_13', cat: 'geo_terms', unit: '2', term: 'معاهدة ماستريخت (1992)', def: 'الاتفاقية المؤسسة للاتحاد الأوروبي الموقعة في 07 فيفري 1992م بهولندا، دخلت حيز التنفيذ في 1 نوفمبر 1993م ومهدت لتوحيد العملة (الأورو).' },
+            { id: 'g2_14', cat: 'geo_terms', unit: '2', term: 'نمور الآسيان', def: 'تسمية أطلقت على اقتصاديات ماليزيا وإندونيسيا والفلبين وتايلاندا، نظرا للتطور الملموس الذي بلغته مستفيدة من التنينات الآسيوية.' },
+            { id: 'g2_15', cat: 'geo_terms', unit: '2', term: 'القطب الاقتصادي', def: 'مركز يمثل نقطة قوة ونشاط اقتصادي كثيف، لتوفره على جميع الشروط (قاعدة - بنية تحتية - رؤوس أموال - تكنولوجيا).' },
+            { id: 'g2_16', cat: 'geo_terms', unit: '2', term: 'الوزن الديمغرافي', def: 'القوة البشرية المعتبرة التي تشكل عامل قوة للدول التي تمتلك تعدادا سكانيا كبيرا وتحسن استثماره وتوظيفه في عملية الإنتاج والتنمية.' },
+            { id: 'g2_17', cat: 'geo_terms', unit: '2', term: 'مجمع المدن (ميقالوبوليس)', def: 'مصطلح يوناني يعني تجمع حضري يتشكل من عدة مدن ذات تعداد وكثافة ديموغرافية كبيرة، تتميز بتعدد أنشطتها الاقتصادية ووفرة خطوط المواصلات وتمتد على شكل شريط شبه متصل.' },
+            { id: 'g2_18', cat: 'geo_terms', unit: '2', term: 'التنينات الأربعة', def: 'تسمية أطلقت على اقتصاديات الرباعي (هونغ كونغ الصينية، سنغافورة، تايوان، كوريا الجنوبية) التي شهدت نموا سريعا مستفيدة من التقدم الياباني.' },
+            { id: 'g2_19', cat: 'geo_terms', unit: '2', term: 'الآسيان ASEAN', def: 'جمعية أمم جنوب شرق آسيا تأسست بتايلاندا في 08 أوت 1967م وتضم 10 دول ومقرها جاكرتا بإندونيسيا (إندونيسيا، تايلاندا، سنغافورة، الفلبين، ماليزيا، بروناي، فيتنام، اللاوس، ميانمار، كمبوديا).' },
+
+            // ================= GEOGRAPHY TERMS: UNIT 3 =================
+            { id: 'g3_1', cat: 'geo_terms', unit: '3', term: 'الموارد الطبيعية', def: 'جميع الثروات السطحية والباطنية مثل المعادن والبترول والتربة والغابات، التي تنمو وتتشكل بتأثير العوامل الطبيعية وبشكل تلقائي دون تدخل يد الإنسان.' },
+            { id: 'g3_2', cat: 'geo_terms', unit: '3', term: 'الموارد الطبيعية المتجددة', def: 'هي التي تتجدد بصفة مستمرة ما لم يعترض الإنسان القوى التي تساعد على عملية نموها، مثل الغابات والمراعي والمياه والطاقة الشمسية.' },
+            { id: 'g3_3', cat: 'geo_terms', unit: '3', term: 'الموارد غير المتجددة', def: 'الموارد التي تتعرض للزوال والنفاذ نتيجة الإفراط في عملية استغلالها وتتمثل في الموارد الطاقوية والمعدنية.' },
+            { id: 'g3_4', cat: 'geo_terms', unit: '3', term: 'التنمية المتوازنة', def: 'التنمية التي تمس القطاعات الاقتصادية الثلاثة الصناعة والزراعة والخدمات، وتمس كل البلاد ومختلف الجهات وتستفيد منها كل الفئات الاجتماعية.' },
+            { id: 'g3_5', cat: 'geo_terms', unit: '3', term: 'التنمية البشرية', def: 'استعمل المفهوم بداية من سنة 1990م، وهو مفهوم مركب للدلالة على الأوضاع الصحية والغذائية والثقافية وعلى مستوى الإنتاج والاستهلاك لكل شعب.' },
+            { id: 'g3_6', cat: 'geo_terms', unit: '3', term: 'التنمية الشاملة', def: 'التنمية التي تشمل التنمية الاقتصادية والبشرية والسياسية (التعددية والانتخابات النزيهة واحترام الحريات الأساسية وحقوق الإنسان).' },
+            { id: 'g3_7', cat: 'geo_terms', unit: '3', term: 'الاقتصاد الموجه', def: 'الاقتصاد الذي تسيطر عليه الدولة بصورة كلية وتوجهه وذلك عن طريق الملكية العامة لوسائل الإنتاج وتحكمها في التجارة الخارجية وفي تحديد الأسعار (مرتبط بالاشتراكية).' },
+            { id: 'g3_8', cat: 'geo_terms', unit: '3', term: 'القطاع الخاص', def: 'ذلك الجزء من الاقتصاد القومي الذي يملكه ويديره الأفراد (الخواص) أو الشركات الخاصة.' },
+            { id: 'g3_9', cat: 'geo_terms', unit: '3', term: 'القطاع العام', def: 'يشمل المؤسسات والشركات والوحدات الإنتاجية العامة التي تملكها الدولة أو تساهم في جزء كبير من رأسمالها.' },
+            { id: 'g3_10', cat: 'geo_terms', unit: '3', term: 'حرية التجارة', def: 'مبدأ إزالة القيود والحواجز والعقبات التي تحد من تدفق التجارة الدولية وتمنع انتشارها.' },
+            { id: 'g3_11', cat: 'geo_terms', unit: '3', term: 'التنمية المستدامة', def: 'الاستغلال الأمثل للموارد الطبيعية والبشرية المتاحة بشكل متوازن اقتصاديا واجتماعيا، بما يضمن تلبية حاجيات الأجيال الحالية والأجيال المقبلة مع الحفاظ على البيئة.' },
+            { id: 'g3_12', cat: 'geo_terms', unit: '3', term: 'الخوصصة', def: 'سياسة نقل ملكية المنشآت العامة أو إدارتها من القطاع العام إلى القطاع الخاص، وهي عملية تهدف إلى تقليص دور الحكومة ودعم القطاع الخاص.' },
+            { id: 'g3_13', cat: 'geo_terms', unit: '3', term: 'الشراكة', def: 'تعني قيام تعاون بين أطراف لها أهداف مشتركة، ويؤسس هذا التعاون على اتفاقات تحدد أهداف الشراكة ومبادئها ومجالاتها ضمن مبادئ المساواة والعدالة.' },
+            { id: 'g3_14', cat: 'geo_terms', unit: '3', term: 'الأورومتوسطية', def: 'التعاون بين دول ضفتي المتوسط الشمالية والجنوبية، من خلال إعلان مؤتمر برشلونة 27/28 نوفمبر 1995م لإنشاء فضاء شراكة ومنطقة تبادل حرة.' },
+            { id: 'g3_15', cat: 'geo_terms', unit: '3', term: 'النيباد NEPAD', def: 'مبادرة الشراكة الجديدة لتنمية إفريقيا، تأسست في جويلية 2001 بلوزاكا بزامبيا بمبادرة من رؤساء (الجزائر، مصر، السنغال، جنوب إفريقيا، نيجيريا) وتهدف للإصلاح والتحديث.' },
+            { id: 'g3_16', cat: 'geo_terms', unit: '3', term: 'الثورة الخضراء', def: 'سياسة زراعية انتهجتها الهند بداية من سنة 1966م، تقوم على توزيع الأراضي على صغار الفلاحين والتوسع في استخدام البذور المنتقاة والأسمدة لتحقيق الاكتفاء الغذائي.' },
+            { id: 'g3_17', cat: 'geo_terms', unit: '3', term: 'الإصلاح الزراعي', def: 'مجموعة الإجراءات التي تقوم بها الدولة قصد تنظيم الزراعة والحد من الإقطاعية وإدخال التكنولوجيات الحديثة للرفع من مردود الهكتار.' },
+            { id: 'g3_18', cat: 'geo_terms', unit: '3', term: 'البيئة الاستوائية', def: 'تسود المناطق الواقعة شمال وجنوب خط الاستواء (5 درجات) وتتميز بالحرارة والرطوبة الكبيرة وتساقط الأمطار طوال السنة وتنمو بها الغابات الكثيفة.' },
+            { id: 'g3_19', cat: 'geo_terms', unit: '3', term: 'المثلث الحيوي (البرازيل)', def: 'منطقة تمتد على شكل مثلث في الجنوب الشرقي للبرازيل بين المدن: ريو دي جانيرو وساو باولو وبرازيليا (بيلوهوريزانتي)، وتتميز بالكثافة السكانية العالية وتركز الأنشطة الاقتصادية.' },
+            { id: 'g3_20', cat: 'geo_terms', unit: '3', term: 'مثلث العطش', def: 'توصف به المنطقة الشمالية الشرقية من سواحل البرازيل، وتتميز بظاهرة مناخية غريبة هي قلة تساقط الأمطار مقارنة بالمناطق المجاورة رغم وقوعها ضمن مناخ مداري رطب.' },
+            { id: 'g3_21', cat: 'geo_terms', unit: '3', term: 'حوض الأمازون', def: 'هضبة تمتد في شمال البرازيل على مساحة 3.5 مليون كلم2 أي 41% من مساحته، تمتد من جبال الأنديز غربا إلى المحيط الأطلسي شرقا ويخترقها نهر الأمازون (7025 كم).' },
+            { id: 'g3_22', cat: 'geo_terms', unit: '3', term: 'غابة الأمازون', def: 'أكثر الغابات كثافة واتساعا ينمو بها أكثر من 45 ألف نوع من النباتات و2500 نوع من الأشجار الكبيرة تقع شمال البرازيل ولها أهمية بيئية كبيرة (رئة الأرض).' },
+            { id: 'g3_23', cat: 'geo_terms', unit: '3', term: 'الاحتكارات', def: 'ممارسات مخالفة لقانون السوق يقوم بها رجال الصناعة والبنوك والشركات الكبرى قصد الانفراد بسوق أو سلعة وحبس الشيء وقت الرخص وبيعه وقت الغلاء.' },
+
+            // ================= HISTORY TERMS: UNIT 1 =================
+            { id: 'h1_1', cat: 'hist_terms', unit: '1', term: 'دول الحلفاء', def: 'التحالف الدولي الذي تشكل أثناء الحرب العالمية الثانية والمتكون من بريطانيا وفرنسا والولايات المتحدة الأمريكية والاتحاد السوفييتي لمجابهة النازية.' },
+            { id: 'h1_2', cat: 'hist_terms', unit: '1', term: 'دول المحور', def: 'محور (برلين - روما - طوكيو) وهو حلف تزعمته ألمانيا وإيطاليا واليابان أثناء الحرب العالمية الثانية (1939-1945م) ضد دول الحلفاء.' },
+            { id: 'h1_3', cat: 'hist_terms', unit: '1', term: 'الأمم المتحدة', def: 'تنظيم عالمي أنشئ عقب الحرب العالمية الثانية يضم جميع الدول المستقلة، من مهامها تنظيم العلاقات الدولية والمحافظة على الأمن والسلام الدوليين، مقرها نيويورك.' },
+            { id: 'h1_4', cat: 'hist_terms', unit: '1', term: 'مجلس الأمن', def: 'أحد الأجهزة الست لهيئة الأمم المتحدة وأهمها، يتكون من خمسة أعضاء دائمين يتمتعون بحق الفيتو (الو.م.أ، روسيا، فرنسا، بريطانيا، الصين) وعشرة غير دائمين.' },
+            { id: 'h1_5', cat: 'hist_terms', unit: '1', term: 'حق النقض (الفيتو)', def: 'حق الاعتراض نصت عليه المادة 23 من ميثاق الأمم المتحدة، تتمتع به الدول الخمس الدائمة العضوية في مجلس الأمن لإسقاط أي قرار.' },
+            { id: 'h1_6', cat: 'hist_terms', unit: '1', term: 'الحرب الباردة', def: 'الصراع الأيديولوجي بين المعسكر الشرقي الشيوعي بزعامة الاتحاد السوفييتي والغربي الرأسمالي بزعامة الو.م.أ، استخدمت فيها كل الوسائل ما عدا الأسلحة المباشرة.' },
+            { id: 'h1_7', cat: 'hist_terms', unit: '1', term: 'الصراع الأيديولوجي', def: 'صراع فكري عقائدي بين نظامين متناقضين (الشيوعية والرأسمالية) بحيث يحاول كل منهما القضاء على الآخر وفرض مذهبه على العالم.' },
+            { id: 'h1_8', cat: 'hist_terms', unit: '1', term: 'المعسكر الرأسمالي', def: 'مجموعة الدول التي تتبنى الأفكار الليبرالية الحرة كمنهج سياسي واقتصادي وفكري وتدور في فلك الو.م.أ.' },
+            { id: 'h1_9', cat: 'hist_terms', unit: '1', term: 'المعسكر الشيوعي', def: 'مجموعة الدول التي تبنت الأفكار الشيوعية الاشتراكية كمنهج سياسي واقتصادي وفكري، وكانت تدور في فلك الاتحاد السوفييتي أثناء الحرب الباردة.' },
+            { id: 'h1_10', cat: 'hist_terms', unit: '1', term: 'سياسة الأحلاف', def: 'تكتلات عسكرية ظهرت أثناء الحرب الباردة، جمعت دولا ذات مصالح مشتركة بزعامة إحدى القوتين وأهمها الحلف الأطلسي وحلف وارسو لردع أي اعتداء.' },
+            { id: 'h1_11', cat: 'hist_terms', unit: '1', term: 'سياسة المشاريع', def: 'سياسة ظهرت في الحرب الباردة تمثلت في سعي كل طرف لاحتواء واستقطاب أكبر عدد من الدول عبر مشاريع مثل مارشال وترومان وأيزنهاور والكوميكون.' },
+            { id: 'h1_12', cat: 'hist_terms', unit: '1', term: 'سياسة الاحتواء', def: 'سياسة صاغها مستشار الرئيس ترومان جورج كينان في 1947 وتعني محاصرة وتطويق الاتحاد السوفييتي ومنع انتشار الشيوعية بكل الطرق.' },
+            { id: 'h1_13', cat: 'hist_terms', unit: '1', term: 'سياسة ملء الفراغ', def: 'سياسة استعمارية تبنتها الو.م.أ وتعني تعويض القوى الاستعمارية التقليدية (فرنسا وبريطانيا) في مستعمراتها القديمة بحجة مواجهة المد الشيوعي، وكانت فيتنام أول ضحاياها.' },
+            { id: 'h1_14', cat: 'hist_terms', unit: '1', term: 'الستار الحديدي', def: 'مصطلح استخدمه رئيس وزراء بريطانيا ونستن تشرشل لما تحدث عن أطماع الاتحاد السوفييتي التوسعية، ويقصد به دول أوروبا الشرقية والوسطى التي وقعت في قبضة السوفييت.' },
+            { id: 'h1_15', cat: 'hist_terms', unit: '1', term: 'الرأسمالية', def: 'مجموعة أفكار ونظريات ومفاهيم سياسية اقتصادية واجتماعية تقوم أساسا على الملكية الخاصة لوسائل الإنتاج والحرية السياسية والاقتصادية.' },
+            { id: 'h1_16', cat: 'hist_terms', unit: '1', term: 'الاشتراكية', def: 'نظام اجتماعي سياسي اقتصادي يقوم أساسا على الملكية العامة لوسائل الإنتاج.' },
+            { id: 'h1_17', cat: 'hist_terms', unit: '1', term: 'المجال الحيوي', def: 'سياسة توسعية لألمانيا النازية، تهدف إلى السيطرة على مناطق الدول المجاورة لدعم قوة الشعب الألماني.' },
+            { id: 'h1_18', cat: 'hist_terms', unit: '1', term: 'مبدأ ترومان', def: 'نسبة للرئيس الأمريكي هاري ترومان نص على تقديم مساعدات للدول التي تحارب ضد الشيوعية، واستفادت تركيا واليونان بمساعدات قدرت بـ 400 مليون دولار.' },
+            { id: 'h1_19', cat: 'hist_terms', unit: '1', term: 'مشروع مارشال', def: 'نسبة لوزير خارجية الو.م.أ جورج مارشال، صدر في 05 جوان 1947 وينص على تقديم إعانات مالية لدول أوروبا لإعادة بنائها بعد الحرب العالمية الثانية.' },
+            { id: 'h1_20', cat: 'hist_terms', unit: '1', term: 'مبدأ جدانوف', def: 'نسبة لرجل الدولة السوفييتي أندري جدانوف، أعلن في 22 سبتمبر 1947 كرد فعل على مشروع مارشال، يقسم العالم إلى معسكر ديمقراطي شرقي ومعسكر إمبريالي غربي.' },
+            { id: 'h1_21', cat: 'hist_terms', unit: '1', term: 'الحلف الأطلسي NATO', def: 'تأسس بناء على معاهدة شمال الأطلسي في واشنطن في 4 أفريل 1949، مقر قيادته بروكسل، يضم الو.م.أ وحلفاءها الغربيين لمواجهة الشيوعية.' },
+            { id: 'h1_22', cat: 'hist_terms', unit: '1', term: 'حلف جنوب شرق آسيا SEATO', def: 'تأسس بموجب معاهدة مانيلا في 08 سبتمبر 1954 هدفه تطويق الشيوعية في جنوب شرق آسيا بعد انسحاب فرنسا من الهند الصينية، تم حله في 30 جوان 1977.' },
+            { id: 'h1_23', cat: 'hist_terms', unit: '1', term: 'حلف بغداد', def: 'تأسس في 24 فبراير 1955 في بغداد من طرف تركيا والعراق وبريطانيا وباكستان وإيران، انسحبت منه العراق 1958 ونقل مقره لأنقرة وأصبح يسمى بالحلف المركزي.' },
+            { id: 'h1_24', cat: 'hist_terms', unit: '1', term: 'حلف وارسو', def: 'أنشئ في 14 ماي 1955م مقره فرصوفيا في بولونيا بزعامة الاتحاد السوفييتي ودول أوروبا الشرقية لمواجهة الأحلاف الغربية، تم حله رسميا في جويلية 1991.' },
+            { id: 'h1_25', cat: 'hist_terms', unit: '1', term: 'الديمقراطيات الشعبية', def: 'مصطلح يطلق على دول وسط وشرق أوروبا التي حررها الاتحاد السوفييتي من النازية وتبنت النظام الشيوعي ودارت في فلكه.' },
+            { id: 'h1_26', cat: 'hist_terms', unit: '1', term: 'منظمة الكومكون', def: 'تأسست في 25 جانفي 1949، وهي منظمة التبادل والتعاون الاقتصادي بين دول المعسكر الشيوعي لإقامة سوق حرة للتبادل بينها.' },
+            { id: 'h1_27', cat: 'hist_terms', unit: '1', term: 'مكتب الكومنفورم', def: 'مكتب الإعلام الشيوعي تأسس في 05 أكتوبر 1947 هدفه الدعاية للنظام الشيوعي، اعتبره الغرب مكتبا للتجسس، تم حله في أفريل 1956.' },
+            { id: 'h1_28', cat: 'hist_terms', unit: '1', term: 'الإمبريالية', def: 'هيمنة اقتصادية وعسكرية وثقافية وسياسية لدولة أو مجموعة دول على دولة أو عدة دول ونهب ثرواتها وهي صورة أخرى للاستعمار الحديث.' },
+            { id: 'h1_29', cat: 'hist_terms', unit: '1', term: 'التعايش السلمي', def: 'مفهوم دعا إليه الاتحاد السوفييتي عقب وفاة ستالين للتقارب بين المعسكرين وحل النزاعات بالطرق السلمية مع القبول بفكرة تعدد الأنظمة.' },
+            { id: 'h1_30', cat: 'hist_terms', unit: '1', term: 'الانفراج الدولي', def: 'التحسن الملحوظ في العلاقات الدولية وإبعاد شبح الحرب خاصة بعد الستينات للتخلص من شدة الضيق الذي وصل إليه العالم.' },
+            { id: 'h1_31', cat: 'hist_terms', unit: '1', term: 'قناة السويس', def: 'ممر مائي اصطناعي يربط البحر المتوسط بالبحر الأحمر بطول 193 كلم، أممها الرئيس جمال عبد الناصر في 26 جويلية 1956 فكانت سببا في العدوان الثلاثي.' },
+            { id: 'h1_32', cat: 'hist_terms', unit: '1', term: 'الثنائية القطبية', def: 'نظام دولي يتميز بوجود قطبين مختلفين أيديولوجيا ومتناقضين في المصالح (الو.م.أ والاتحاد السوفييتي) يسعى كل منهما لفرض سيطرته على العالم.' },
+            { id: 'h1_33', cat: 'hist_terms', unit: '1', term: 'الخط الهاتفي الأحمر', def: 'خط هاتفي مباشر أنشئ سنة 1963 يربط بين البيت الأبيض في واشنطن والكرملين في موسكو، ولا يستخدم إلا في حالة الضرورة القصوى.' },
+            { id: 'h1_34', cat: 'hist_terms', unit: '1', term: 'البريسترويكا والغلاسنوست', def: 'كلمتان روسيتان تعني الأولى إعادة البناء (إصلاح الاقتصاد بالتوجه لاقتصاد السوق) والثانية الشفافية (إدخال إصلاحات ديمقراطية)، جاء بهما غورباتشوف.' },
+            { id: 'h1_35', cat: 'hist_terms', unit: '1', term: 'الأحادية القطبية', def: 'نظام دولي تتزعمه الولايات المتحدة الأمريكية منفردة بعد انهيار الاتحاد السوفييتي ونهاية الحرب الباردة في قمة مالطا (ديسمبر 1989).' },
+            { id: 'h1_36', cat: 'hist_terms', unit: '1', term: 'الشرعية الدولية', def: 'الالتزام والتقيد واحترام القرارات الصادرة عن الهيئات الدولية وخاصة الأمم المتحدة وأجهزتها.' },
+            { id: 'h1_37', cat: 'hist_terms', unit: '1', term: 'النظام الدولي الجديد', def: 'مفهوم برز بعد لقاء مالطا 1989م، وهو طرح أمريكي يقوم على توسيع مفاهيم العولمة والليبرالية وفرض منطق الهيمنة الأمريكية على العالم.' },
+            { id: 'h1_38', cat: 'hist_terms', unit: '1', term: 'المنظمات غير الحكومية', def: 'منظمات أو هيئات خيرية عالمية غير تجارية تعرف بالمجتمع المدني ويعمل فيها متطوعون في الميادين الإنسانية مثل أطباء بلا حدود.' },
+            { id: 'h1_39', cat: 'hist_terms', unit: '1', term: 'إمبراطورية الشر', def: 'مصطلح أطلقه الرئيس الأمريكي رونالد ريغان سنة 1982م للدلالة على الاتحاد السوفييتي وحلفائه.' },
+            { id: 'h1_40', cat: 'hist_terms', unit: '1', term: 'محور الشر', def: 'تعبير أطلقه جورج بوش الابن سنة 2002 عن الدول الرافضة للهيمنة الأمريكية والراغبة في السلاح النووي وعلى رأسها كوريا الشمالية والعراق وإيران.' },
+            { id: 'h1_41', cat: 'hist_terms', unit: '1', term: 'الترويكا', def: 'كلمة روسية تعني القيادة الثلاثية التي حكمت الاتحاد السوفييتي بعد وفاة ستالين سنة 1953 (بولغانين + خروتشوف + مالينكوف).' },
+            { id: 'h1_42', cat: 'hist_terms', unit: '1', term: 'الحياد الإيجابي', def: 'عدم الميل إلى الكتلتين المتصارعتين مع العمل على تحقيق التقارب والتعاون والدعوة للسلم ونصرة القضايا العادلة، وهو من أهم مبادئ حركة عدم الانحياز.' },
+            { id: 'h1_43', cat: 'hist_terms', unit: '1', term: 'حرب النجوم', def: 'مشروع جاء به الرئيس الأمريكي رونالد ريغان سنة 1983 يقضي بتدمير صواريخ العدو في الفضاء قبل وصولها للولايات المتحدة عبر حزام صاروخي دفاعي.' },
+
+            // ================= HISTORY TERMS: UNIT 2 =================
+            { id: 'h2_1', cat: 'hist_terms', unit: '2', term: 'حرب التحرير', def: 'العمليات العسكرية والسياسية التي شهدتها الجزائر في الفترة الممتدة بين 1954 إلى غاية 1962م، بهدف تحقيق الاستقلال واسترجاع السيادة.' },
+            { id: 'h2_2', cat: 'hist_terms', unit: '2', term: 'الثورة التحريرية', def: 'عمل تحرري شامل قاده الشعب الجزائري بزعامة جبهة وجيش التحرير الوطني (1954-1962).' },
+            { id: 'h2_3', cat: 'hist_terms', unit: '2', term: 'سياسة الإغراء', def: 'إصلاحات ومشاريع سياسية واقتصادية واجتماعية اتبعها الاستعمار لكسب الشعب وإبعاده عن الثورة وخلق جماعات المصالح، من أهمها مشروع قسنطينة 1958م.' },
+            { id: 'h2_4', cat: 'hist_terms', unit: '2', term: 'سياسة القمع', def: 'جملة القوانين والإجراءات التعسفية الإجرامية التي أقدمت عليها فرنسا في حق الشعب الجزائري من تنكيل وإبادة جماعية وتهجير، كما حدث في سطيف وقالمة وخراطة.' },
+            { id: 'h2_5', cat: 'hist_terms', unit: '2', term: 'حالة الطوارئ', def: 'وضع جميع السلطات استثنائيا في يد السلطات العسكرية والتي تكلف بتسيير البلاد لمدة معينة.' },
+            { id: 'h2_6', cat: 'hist_terms', unit: '2', term: 'التيار الثوري', def: 'مجموعة الشباب المتحمس المؤمن بضرورة العمل المسلح والثورة، وهم أفراد المنظمة الخاصة.' },
+            { id: 'h2_7', cat: 'hist_terms', unit: '2', term: 'تصفية الاستعمار', def: 'الجهود والتضحيات التي قدمتها الشعوب المستعمرة لطرد القوى المحتلة وتحقيق الاستقلال والحرية.' },
+            { id: 'h2_8', cat: 'hist_terms', unit: '2', term: 'المواثيق', def: 'مجموعة القرارات المتفق عليها والتي تأخذ صفة المبادئ والأسس، مثل ميثاق الصومام وميثاق طرابلس.' },
+            { id: 'h2_9', cat: 'hist_terms', unit: '2', term: 'الدبلوماسية', def: 'الجهود التي بذلتها جبهة التحرير لكسب الدعم السياسي والتعاطف العالمي مع الثورة (وفن إدارة العلاقات الدولية والتفاوض).' },
+            { id: 'h2_10', cat: 'hist_terms', unit: '2', term: 'مشروع سوستيل', def: 'نسبة لصاحبه جاك سوستيل الوالي العام على الجزائر في 25 جانفي 1955، تناول جوانب إصلاحية إدارية واقتصادية بهدف شراء ذمم الجزائريين للتخلي عن الثورة.' },
+            { id: 'h2_11', cat: 'hist_terms', unit: '2', term: 'المكاتب العربية SAS', def: 'أنشأها الاستعمار للإحصاء والتجسس ثم أصبحت سنة 1955 تسمى المصالح الإدارية المختصة SAS شكلها سوستيل لممارسة الحرب النفسية والدعائية ضد الثورة.' },
+            { id: 'h2_12', cat: 'hist_terms', unit: '2', term: 'المحتشدات', def: 'مراكز مسيجة ومحروسة لجأت إليها فرنسا لخنق الثورة عن طريق عزل الشعب عنها، وضمت قرابة 3 ملايين جزائري.' },
+            { id: 'h2_13', cat: 'hist_terms', unit: '2', term: 'مشروع قسنطينة', def: 'مشروع استعماري إغرائي أعلنه الجنرال ديغول في 4 أكتوبر 1958 بقسنطينة، يتضمن بناء 200 ألف مسكن وتوزيع أراضٍ ووظائف بهدف إفشال الثورة وخلق فئة برجوازية موالية.' },
+            { id: 'h2_14', cat: 'hist_terms', unit: '2', term: 'مخطط شال', def: 'نسبة للجنرال شال، إجراءات شاملة تهدف للقضاء على الثورة بتكثيف العمليات العسكرية وعزل وحدات الجيش وغلق الحدود التونسية والمغربية.' },
+            { id: 'h2_15', cat: 'hist_terms', unit: '2', term: 'خطا شال وموريس', def: 'خطان مكهربان (12 ألف فولت) ومسيجان بالأسلاك الشائكة والألغام الفردية ومراكز المراقبة على الحدود الغربية والشرقية للجزائر لشل تحرك الثوار.' },
+            { id: 'h2_16', cat: 'hist_terms', unit: '2', term: 'القوة الثالثة', def: 'طبقة برجوازية عميلة في المجتمع دعمتها فرنسا لتكون بديلا عن الثورة وجهازها السياسي جبهة التحرير الوطني ولتغليط الرأي العام العالمي.' },
+            { id: 'h2_17', cat: 'hist_terms', unit: '2', term: 'سلم الشجعان', def: 'مناورة سياسية أطلقها ديغول يوم 23 أكتوبر 1958، تقضي باستسلام الثوار وتسليم أسلحتهم مقابل ضمان حريتهم وسلامتهم.' },
+            { id: 'h2_18', cat: 'hist_terms', unit: '2', term: 'الثورة الزراعية (الجزائر)', def: 'إصلاحات جذرية أدخلتها الدولة الجزائرية على القطاع الزراعي سنة 1971/1972 تحت شعار "الأرض لمن يخدمها" بهدف تحقيق الاكتفاء الذاتي.' },
+            { id: 'h2_19', cat: 'hist_terms', unit: '2', term: 'حركة عدم الانحياز', def: 'تنظيم سياسي تأسس في مؤتمر بلغراد في 01-06 سبتمبر 1961م، يضم الدول حديثة الاستقلال التي اختارت سياسة الحياد الإيجابي.' },
+            { id: 'h2_20', cat: 'hist_terms', unit: '2', term: 'نظام اقتصادي عالمي جديد', def: 'دعوة تقدمت بها الجزائر مدعومة بدول عدم الانحياز لإعادة صياغة القواعد المنظمة للعلاقات الاقتصادية الدولية على أسس عادلة (خطاب بومدين أفريل 1974م).' },
+            { id: 'h2_21', cat: 'hist_terms', unit: '2', term: 'الأقدام السوداء', def: 'هم الفرنسيون المولودون بالجزائر ويعتبرون أنفسهم أصحاب الحق فيها.' },
+            { id: 'h2_22', cat: 'hist_terms', unit: '2', term: 'المسبلون', def: 'هم المواطنون المدنيون الذين قدموا خدمات تموينية سياسية أو إدارية لصالح الثورة.' },
+            { id: 'h2_23', cat: 'hist_terms', unit: '2', term: 'معركة الجزائر', def: 'العمليات الفدائية الجريئة التي عاشتها العاصمة نهاية 1956 إلى سبتمبر 1957 وتخللها إضراب الثمانية أيام، وتكلف بيجار وماسو بقمعها.' },
+            { id: 'h2_24', cat: 'hist_terms', unit: '2', term: 'منظمة الجيش السري OAS', def: 'تنظيم إرهابي سري أسسه المستوطنون (06 ديسمبر 1961) وبعض قادة الجيش الفرنسي كمحاولة يائسة لبقاء الجزائر فرنسية وتعطيل المفاوضات.' },
+
+            // ================= HISTORY TERMS: UNIT 3 =================
+            { id: 'h3_1', cat: 'hist_terms', unit: '3', term: 'الاستعمار التقليدي', def: 'غزو يعتمد على أساليب الإخضاع الشامل باستخدام القوة والحملات العسكرية لتحقيق الهيمنة التامة ونهب ثروات المستعمرات واستغلال شعوبها مباشرة.' },
+            { id: 'h3_2', cat: 'hist_terms', unit: '3', term: 'الاستعمار المقنع', def: 'استعمار جديد يختفي وراء أقنعة جديدة منها الاتفاقيات السياسية والاقتصادية أو الثقافية والتغلغل باستخدام المساعدات الإنسانية ووسائل الإعلام.' },
+            { id: 'h3_3', cat: 'hist_terms', unit: '3', term: 'التحرر السياسي', def: 'تحقيق الحرية والاستقلال وإخراج قوات المستعمر وبناء دولة وطنية تحظى بالاعتراف الدولي.' },
+            { id: 'h3_4', cat: 'hist_terms', unit: '3', term: 'التحرر الشامل', def: 'استكمال الاستقلال السياسي بالاستقلال الاقتصادي بحيث تشرف الدولة وتتحكم في جميع ثرواتها الاقتصادية مما يعطيها السيادة التامة.' },
+            { id: 'h3_5', cat: 'hist_terms', unit: '3', term: 'التبعية (الكومنولث والفرانكفونية)', def: 'علاقات غير متكافئة تقوم بين الدول الاستعمارية الكبرى ومستعمراتها السابقة في المجال الاقتصادي والسياسي والثقافي، مثل منظمتي الكومنولث والفرانكفونية.' },
+            { id: 'h3_6', cat: 'hist_terms', unit: '3', term: 'التمييز العنصري (الأبرتايد)', def: 'التمييز والتفضيل بين البشر بسبب العرق أو اللون أو النسب أو الأصل، كما كان الحال في جنوب إفريقيا مع نظام الأبرتايد والحركة الصهيونية في فلسطين.' },
+            { id: 'h3_7', cat: 'hist_terms', unit: '3', term: 'الحدود الموروثة', def: 'تلك الحدود التي ورثتها الدول المستقلة حديثا عن الاستعمار، والتي وضعتها الدول الاستعمارية وكثيرا ما تتسبب في نشوب الحروب بين دول الجوار.' },
+            { id: 'h3_8', cat: 'hist_terms', unit: '3', term: 'الحكم الذاتي (1993)', def: 'ما نصت عليه الاتفاقية الموقعة في 13 سبتمبر 1993 بواشنطن بين منظمة التحرير الفلسطينية والكيان الصهيوني لتأسيس سلطة وطنية فلسطينية في غزة وأريحا.' },
+            { id: 'h3_9', cat: 'hist_terms', unit: '3', term: 'الانتفاضة الفلسطينية', def: 'شكل من أشكال المقاومة الشعبية ابتكره الفلسطينيون ضد الوجود الإسرائيلي بداية من 07/08 ديسمبر 1987 وتقوم على المظاهرات والمقاطعة والمواجهة.' },
+            { id: 'h3_10', cat: 'hist_terms', unit: '3', term: 'الحركة الصهيونية', def: 'حركة سياسية عنصرية ظهرت بمؤتمر "بال" بسويسرا سنة 1897م، عمل زعماؤها على المطالبة بإقامة وطن قومي لليهود في فلسطين، مؤسسها تيودور هرتزل.' },
+
+            // ================= CHARACTERS: UNIT 1 (ALL 20) =================
+            { id: 'c1_1', cat: 'characters', unit: '1', term: 'هاري ترومان', def: 'رئيس الو.م.أ الـ 33 حكم من (1945-1953)، هو الذي أعطى أمرا بقنبلة هيروشيما وناغازاكي، شجع الهجرة اليهودية إلى فلسطين، وصاحب مبدأ ترومان 1947.' },
+            { id: 'c1_2', cat: 'characters', unit: '1', term: 'جوزيف ستالين', def: 'زعيم سوفييتي قاد الاتحاد من (1924-1953م)، تميزت فترة حكمه بالفردية والتشدد، اشتهر بكرهه الشديد للغرب، توفي في 05 مارس 1953.' },
+            { id: 'c1_3', cat: 'characters', unit: '1', term: 'أندري جدانوف', def: 'سياسي سوفييتي صاحب أطروحة الكتلتين (الشرقية والغربية) وصاحب المبدأ المعروف باسمه 1947، يعتبر مهندس الحلف الجرماني السوفييتي 1939م.' },
+            { id: 'c1_4', cat: 'characters', unit: '1', term: 'جورج مارشال', def: 'جنرال أمريكي رئيس الأركان أثناء ح ع II وكاتب الدولة للخارجية (1947-1949)، وضع خطة دعم أوروبا المعروفة باسمه، حاز جائزة نوبل للسلام في 1953م.' },
+            { id: 'c1_5', cat: 'characters', unit: '1', term: 'نيكيتا خروتشوف', def: 'رئيس الاتحاد السوفييتي (1953-1964م) خلف ستالين، صاحب مبادرة التعايش السلمي وأول زعيم سوفييتي يزور الو.م.أ رسميا، وقعت في عهده أزمة كوبا 1962م.' },
+            { id: 'c1_6', cat: 'characters', unit: '1', term: 'جون كنيدي', def: 'أصغر رئيس للو.م.أ حكم من (1961-1963)، اغتيل في 22 نوفمبر 1963 وفي عهده وقعت أزمة الصواريخ في كوبا 1962م.' },
+            { id: 'c1_7', cat: 'characters', unit: '1', term: 'رونالد ريغان', def: 'الرئيس الأربعون للو.م.أ (1981-1989)، انتهج سياسة خارجية متشددة وفي 1983 أطلق مبادرة الدفاع الاستراتيجي ضد الاتحاد السوفييتي (حرب النجوم).' },
+            { id: 'c1_8', cat: 'characters', unit: '1', term: 'ليونيد بريجنيف', def: 'رئيس الاتحاد السوفييتي (1964-1982) خلف خروتشوف، اشتهر بمبدأ بريجنيف الذي ينص على أن سيادة الدول الاشتراكية محدودة.' },
+            { id: 'c1_9', cat: 'characters', unit: '1', term: 'جوزيب بروس تيتو', def: 'رئيس يوغسلافيا منذ (1945 إلى 1980)، زعيم شيوعي عرف بدعمه لحركات التحرر في العالم الثالث ومن القادة المؤسسين لحركة عدم الانحياز 1961م.' },
+            { id: 'c1_10', cat: 'characters', unit: '1', term: 'كيم إيل سونغ', def: 'مؤسس كوريا الشمالية ورئيسها حكم من (1972 إلى 1994)، يلقب عند الكوريين بالقائد أو الزعيم الأكبر.' },
+            { id: 'c1_11', cat: 'characters', unit: '1', term: 'جيورجي مالينكوف', def: 'زعيم سوفييتي وأحد أعضاء القيادة الثلاثية (الترويكا) في الاتحاد بعد وفاة ستالين 1953م رفقة خروتشوف وبولغانين، استقال سنة 1955م.' },
+            { id: 'c1_12', cat: 'characters', unit: '1', term: 'فياتشسلاف مولوتوف', def: 'وزير خارجية الاتحاد السوفييتي في عهد ستالين ومن أبرز معاونيه ومؤسس منظمة الكوميكون 1949.' },
+            { id: 'c1_13', cat: 'characters', unit: '1', term: 'فرانكلين روزفلت', def: 'الرئيس الـ 32 للو.م.أ (1933-1945) أعيد انتخابه ثلاث مرات، ساهم في إخراج بلاده من الأزمة الاقتصادية 1929م وقاد بلاده للنصر في ح ع الثانية.' },
+            { id: 'c1_14', cat: 'characters', unit: '1', term: 'ريتشارد نيكسون', def: 'الرئيس الـ 37 للو.م.أ (1969-1974) استقال بسبب فضيحة ووترغيت، وهو أول رئيس أمريكي يزور الصين، اشتهر بنصرته للصهيونية.' },
+            { id: 'c1_15', cat: 'characters', unit: '1', term: 'ونستن تشرشل', def: 'رئيس وزراء إنجلترا أثناء وبعد ح ع 2، صاحب مصطلح "الستار الحديدي"، نال جائزة نوبل للآداب سنة 1953م.' },
+            { id: 'c1_16', cat: 'characters', unit: '1', term: 'دوايت أيزنهاور', def: 'رئيس الولايات المتحدة الـ 34 (1953-1961) خلف ترومان لعهدتين، انتهج سياسة ملء الفراغ وصاحب مشروع أيزنهاور 1957م.' },
+            { id: 'c1_17', cat: 'characters', unit: '1', term: 'جمال عبد الناصر', def: 'قاد تنظيم الضباط الأحرار في مصر 1952م، رئيس جمهورية مصر (1954-1970)، أمم قناة السويس 1956 وأحد الأعضاء المؤسسين لحركة عدم الانحياز.' },
+            { id: 'c1_18', cat: 'characters', unit: '1', term: 'فيدال كاسترو', def: 'زعيم الثورة الكوبية، قاد انقلابا ضد نظام باتيستا عام 1959، مؤسس أول دولة شيوعية موالية للاتحاد السوفييتي في أمريكا اللاتينية.' },
+            { id: 'c1_19', cat: 'characters', unit: '1', term: 'إرنستو تشي غيفارا', def: 'طبيب من أصل أرجنتيني، ثوري ومناضل ناضل في أمريكا اللاتينية وبالأخص إلى جانب فيدال كاسترو في كوبا، اغتيل في بوليفيا عام 1967.' },
+            { id: 'c1_20', cat: 'characters', unit: '1', term: 'أحمد سوكارنو', def: 'أول رئيس لإندونيسيا بين (1945-1967)، أعلن استقلال بلاده عن هولندا 1945 وأحد الأعضاء المؤسسين لحركة عدم الانحياز.' },
+
+            // ================= CHARACTERS: UNIT 2 (ALL 19) =================
+            { id: 'c2_1', cat: 'characters', unit: '2', term: 'مصالي الحاج', def: 'ولد بتلمسان، زعيم التيار الاستقلالي ومؤسس نجم شمال إفريقيا 1926، غير أن موقفه كان سلبيا من الثورة، توفي بباريس في 1974م.' },
+            { id: 'c2_2', cat: 'characters', unit: '2', term: 'عبد الحميد بن باديس', def: 'ولد بقسنطينة، مؤسس جمعية العلماء المسلمين الجزائريين 1931، رائد حركة الإصلاح والمدافع عن القيم والثوابت الوطنية، توفي في 16 أفريل 1940م.' },
+            { id: 'c2_3', cat: 'characters', unit: '2', term: 'فرحات عباس', def: 'ولد بجيجل، زعيم التيار الإدماجي، قام بتحرير بيان 03 فبراير 1943، التحق بالثورة سنة 1956 وأصبح أول رئيس للحكومة المؤقتة سنة 1958م.' },
+            { id: 'c2_4', cat: 'characters', unit: '2', term: 'أحمد بن بلة', def: 'ولد بمغنية، قيادي في المنظمة الخاصة وأحد مفجري الثورة، اعتقل في عملية القرصنة الجوية 1956 وأول رئيس للدولة الجزائرية المستقلة (1962-1965).' },
+            { id: 'c2_5', cat: 'characters', unit: '2', term: 'هواري بومدين', def: 'ولد بقالمة، قائد الولاية الخامسة 1957 ثم قائدا للأركان 1960 ووزيرا للدفاع، نظم التصحيح الثوري في 19 جوان 1965 وتوفي في 27 ديسمبر 1978م.' },
+            { id: 'c2_6', cat: 'characters', unit: '2', term: 'بن يوسف بن خدة', def: 'قيادي في حركة انتصار الحريات الديمقراطية، مولود بالبرواقية، التحق بالثورة 1955 وأصبح رئيسا للحكومة المؤقتة في 28 أوت 1961.' },
+            { id: 'c2_7', cat: 'characters', unit: '2', term: 'محمد البشير الإبراهيمي', def: 'ولد بسطيف، من أعلام الفكر والأدب، أصبح رئيسا لجمعية العلماء المسلمين بعد وفاة ابن باديس سنة 1940، توفي في 20 ماي 1965م.' },
+            { id: 'c2_8', cat: 'characters', unit: '2', term: 'مصطفى بن بولعيد', def: 'ولد بباتنة، من مؤسسي المنظمة الخاصة وعضو لجنة الـ 22 ومجموعة الـ 6، عين قائدا للولاية الأولى، استشهد في 22 مارس 1956م إثر انفجار مذياع مفخخ.' },
+            { id: 'c2_9', cat: 'characters', unit: '2', term: 'العربي بن مهيدي', def: 'ولد بعين مليلة، شارك في تأسيس المنظمة الخاصة، عين قائدا للولاية الخامسة وأشرف على إضراب السبعة أيام بالعاصمة، استشهد تحت التعذيب في 04 مارس 1957.' },
+            { id: 'c2_10', cat: 'characters', unit: '2', term: 'ديدوش مراد', def: 'ولد بالمرادية بالجزائر، ساهم في تأسيس المنظمة الخاصة وتحرير بيان أول نوفمبر، عين قائدا للولاية الثانية، استشهد في 18 جانفي 1955م.' },
+            { id: 'c2_11', cat: 'characters', unit: '2', term: 'محمد بوضياف', def: 'ولد بالمسيلة، عضو مجموعة 22 ومجموعة 6، اعتقل في حادثة اختطاف الطائرة 1956، نصب رئيسا للمجلس الأعلى للدولة 1992 واغتيل بعنابة في 29 يونيو 1992.' },
+            { id: 'c2_12', cat: 'characters', unit: '2', term: 'كريم بلقاسم', def: 'ولد بذراع الميزان، أحد مفجري الثورة وعضو مجموعة الستة، قاد العمليات بمنطقة القبائل وشارك في مؤتمر الصومام 1956 ومفاوضات إيفيان.' },
+            { id: 'c2_13', cat: 'characters', unit: '2', term: 'رابح بيطاط', def: 'ولد بقسنطينة، عضو في مجموعة 22 ومجموعة الـ 06، اعتقل سنة 1955 وتولى رئاسة المجلس الشعبي الوطني بعد الاستقلال.' },
+            { id: 'c2_14', cat: 'characters', unit: '2', term: 'حسين آيت أحمد', def: 'ولد بالقبائل، من أبرز عناصر المنظمة الخاصة، اعتقل في حادثة اختطاف الطائرة 1956م، وهو مؤسس جبهة القوى الاشتراكية.' },
+            { id: 'c2_15', cat: 'characters', unit: '2', term: 'محمد خيضر', def: 'انخرط في نجم شمال إفريقيا وحزب الشعب، لجأ إلى القاهرة 1951 وكان من بين المختطفين في حادثة الطائرة 1956.' },
+            { id: 'c2_16', cat: 'characters', unit: '2', term: 'الشاذلي بن جديد', def: 'شارك في الثورة، عضو مجلس الثورة 1965 ورئيسا للجمهورية ما بين (1979-1992) وفي عهده أقرت التعددية السياسية في الجزائر.' },
+            { id: 'c2_17', cat: 'characters', unit: '2', term: 'شارل ديغول', def: 'سياسي وجنرال فرنسي، مؤسس الجمهورية الفرنسية الخامسة عام 1958، جمعت سياسته بين القمع والإغراء ووقع اتفاقيات إيفيان 1962م.' },
+            { id: 'c2_18', cat: 'characters', unit: '2', term: 'ليون بلوم', def: 'سياسي فرنسي رئيس حكومة الجبهة الشعبية الفرنسية (1936-1937)، صاحب المشروع الإدماجي المعروف بمشروع بلوم - فيوليت 1936م.' },
+            { id: 'c2_19', cat: 'characters', unit: '2', term: 'جاك سوستيل', def: 'عين أثناء الثورة واليا عاما على الجزائر 1955م وهو صاحب مشروع سوستيل الإغرائي ومدافع عن "الجزائر الفرنسية".' },
+            { id: 'c2_20', cat: 'characters', unit: '2', term: 'زيغود يوسف', def: 'ولد بنواحي قسنطينة، عضو المنظمة الخاصة، بعد استشهاد ديدوش مراد تولى قيادة الولاية الثانية وقام بتنظيم هجومات 20 أوت 1955.' },
+
+            // ================= CHARACTERS: UNIT 3 =================
+            { id: 'c3_1', cat: 'characters', unit: '3', term: 'المهاتما غاندي', def: 'زعيم هندي ناضل ضد الوجود البريطاني، دعا إلى نبذ العنف والتسامح بين الهندوس والمسلمين، صاحب ثورة اللاعنف، اغتيل عام 1948م.' },
+            { id: 'c3_2', cat: 'characters', unit: '3', term: 'جواهر لال نهرو', def: 'زعيم هندي تلميذ غاندي، أول رئيس وزراء للهند المستقلة (1947-1964) وكان من أهم الفاعلين في مؤتمر باندونغ 1955م.' },
+            { id: 'c3_3', cat: 'characters', unit: '3', term: 'محمد علي جناح', def: 'مؤسس دولة باكستان وأول رئيس لها سنة 1947، مناضل وسياسي باكستاني ناضل في إطار الرابطة الإسلامية لتحرير شبه القارة الهندية.' },
+            { id: 'c3_4', cat: 'characters', unit: '3', term: 'هوشي منه', def: 'مؤسس الحزب الشيوعي الفيتنامي، قاد حربا ضد الوجود الفرنسي (1946-1954) ثم ضد الولايات المتحدة في الجنوب وتوفي في 1969م.' },
+            { id: 'c3_5', cat: 'characters', unit: '3', term: 'ياسر عرفات', def: 'سياسي فلسطيني ورمز حركة النضال الفلسطيني الملقب "أبو عمار"، قائد حركة فتح ورئيس السلطة الفلسطينية، حاصل على نوبل للسلام 1994م.' },
+            { id: 'c3_6', cat: 'characters', unit: '3', term: 'ديفيد بن غوريون', def: 'أول رئيس وزراء لإسرائيل ومعلن تأسيس دولة إسرائيل في 15 ماي 1948 وهو صهيوني متعصب من يهود بولونيا.' },
+
+            // ================= DATES: UNIT 1 =================
+            { id: 'd1_1', cat: 'dates', unit: '1', year: 1941, term: '14 أوت 1941', def: 'توقيع الميثاق الأطلسي بين الولايات المتحدة الأمريكية وبريطانيا.' },
+            { id: 'd1_2', cat: 'dates', unit: '1', year: 1945.1, term: '04 - 11 فبراير 1945', def: 'انعقاد مؤتمر يالطا بين روزفلت وستالين وتشرشل.' },
+            { id: 'd1_3', cat: 'dates', unit: '1', year: 1945.5, term: '17 جويلية - 02 أوت 1945', def: 'انعقاد مؤتمر بوتسدام بين الو.م.أ وبريطانيا والاتحاد السوفييتي.' },
+            { id: 'd1_4', cat: 'dates', unit: '1', year: 1945.6, term: '06 و 09 أوت 1945', def: 'إلقاء القنبلتين الذريتين على هيروشيما (06 أوت) وناغازاكي (09 أوت) في اليابان.' },
+            { id: 'd1_5', cat: 'dates', unit: '1', year: 1945.8, term: '24 أكتوبر 1945', def: 'تأسيس هيئة الأمم المتحدة رسميا.' },
+            { id: 'd1_6', cat: 'dates', unit: '1', year: 1947.2, term: '12 مارس 1947', def: 'إعلان الرئيس الأمريكي هاري ترومان عن مبدأ ترومان.' },
+            { id: 'd1_7', cat: 'dates', unit: '1', year: 1947.4, term: '05 جوان 1947', def: 'الإعلان عن مشروع مارشال لإعادة إعمار أوروبا.' },
+            { id: 'd1_8', cat: 'dates', unit: '1', year: 1947.7, term: '22 سبتمبر 1947', def: 'الإعلان عن مبدأ جدانوف السوفييتي.' },
+            { id: 'd1_9', cat: 'dates', unit: '1', year: 1947.8, term: '05 أكتوبر 1947', def: 'تأسيس مكتب الكومنفورم (مكتب الإعلام الشيوعي).' },
+            { id: 'd1_10', cat: 'dates', unit: '1', year: 1948.4, term: '24 جوان 1948 - 12 ماي 1949', def: 'حصار برلين من طرف الاتحاد السوفييتي وإنشاء الجسر الجوي الغربي لفك الحصار.' },
+            { id: 'd1_11', cat: 'dates', unit: '1', year: 1949.1, term: '25 جانفي 1949', def: 'تأسيس منظمة الكومكون للتعاون الاقتصادي بين دول المعسكر الشرقي.' },
+            { id: 'd1_12', cat: 'dates', unit: '1', year: 1949.3, term: '04 أفريل 1949', def: 'تأسيس الحلف الأطلسي (NATO) في واشنطن.' },
+            { id: 'd1_13', cat: 'dates', unit: '1', year: 1949.8, term: '01 أكتوبر 1949', def: 'انتصار الثورة الشيوعية في الصين وقيام جمهورية الصين الشعبية.' },
+            { id: 'd1_14', cat: 'dates', unit: '1', year: 1950.4, term: '25 جوان 1950 - 27 جويلية 1953', def: 'بداية ونهاية الحرب الكورية بين كوريا الشمالية والجنوبية.' },
+            { id: 'd1_15', cat: 'dates', unit: '1', year: 1954.7, term: '08 سبتمبر 1954', def: 'تأسيس حلف جنوب شرق آسيا (SEATO) بموجب معاهدة مانيلا.' },
+            { id: 'd1_16', cat: 'dates', unit: '1', year: 1955.1, term: '24 فبراير 1955', def: 'تأسيس حلف بغداد (الحلف المركزي لاحقا).' },
+            { id: 'd1_17', cat: 'dates', unit: '1', year: 1955.3, term: '18 - 24 أفريل 1955', def: 'انعقاد مؤتمر باندونغ بإندونيسيا (التضامن الأفرو-آسيوي).' },
+            { id: 'd1_18', cat: 'dates', unit: '1', year: 1955.4, term: '14 ماي 1955', def: 'تأسيس حلف وارسو العسكري بزعامة الاتحاد السوفييتي.' },
+            { id: 'd1_19', cat: 'dates', unit: '1', year: 1956.5, term: '26 جويلية 1956', def: 'إعلان جمال عبد الناصر عن تأميم قناة السويس.' },
+            { id: 'd1_20', cat: 'dates', unit: '1', year: 1956.8, term: '29 أكتوبر 1956', def: 'بداية العدوان الثلاثي (بريطانيا، فرنسا، إسرائيل) على مصر.' },
+            { id: 'd1_21', cat: 'dates', unit: '1', year: 1957.1, term: '05 جانفي 1957', def: 'الإعلان عن مشروع إيزنهاور للشرق الأوسط.' },
+            { id: 'd1_22', cat: 'dates', unit: '1', year: 1961.3, term: '12 أفريل 1961', def: 'أول رحلة لغزو الفضاء من طرف الرائد السوفييتي يوري غاغارين.' },
+            { id: 'd1_23', cat: 'dates', unit: '1', year: 1961.6, term: '13 أوت 1961', def: 'إقامة جدار برلين الفاصل بين برلين الشرقية والغربية.' },
+            { id: 'd1_24', cat: 'dates', unit: '1', year: 1961.7, term: '01 - 06 سبتمبر 1961', def: 'انعقاد مؤتمر بلغراد وتأسيس حركة عدم الانحياز.' },
+            { id: 'd1_25', cat: 'dates', unit: '1', year: 1962.8, term: '14 - 28 أكتوبر 1962', def: 'أزمة الصواريخ النووية في كوبا بين الو.م.أ والاتحاد السوفييتي.' },
+            { id: 'd1_26', cat: 'dates', unit: '1', year: 1963.5, term: '20 جوان 1963', def: 'إنشاء الخط الهاتفي الأحمر بين البيت الأبيض والكرملين.' },
+            { id: 'd1_27', cat: 'dates', unit: '1', year: 1963.9, term: '22 نوفمبر 1963', def: 'اغتيال الرئيس الأمريكي جون كينيدي في دالاس.' },
+            { id: 'd1_28', cat: 'dates', unit: '1', year: 1972.4, term: '26 ماي 1972', def: 'التوقيع على معاهدة سالت الأولى (SALT 1) للحد من الأسلحة الاستراتيجية.' },
+            { id: 'd1_29', cat: 'dates', unit: '1', year: 1979.5, term: '18 جوان 1979', def: 'التوقيع على اتفاقية سالت الثانية (SALT 2).' },
+            { id: 'd1_30', cat: 'dates', unit: '1', year: 1989.8, term: '09 نوفمبر 1989', def: 'سقوط جدار برلين التاريخي.' },
+            { id: 'd1_31', cat: 'dates', unit: '1', year: 1989.9, term: '03 - 04 ديسمبر 1989', def: 'قمة مالطا بين جورج بوش وميخائيل غورباتشوف ونهاية الحرب الباردة.' },
+            { id: 'd1_32', cat: 'dates', unit: '1', year: 1990.8, term: '03 أكتوبر 1990', def: 'توحيد الألمانيتين رسميا.' },
+            { id: 'd1_33', cat: 'dates', unit: '1', year: 1991.5, term: '01 جويلية 1991', def: 'حل حلف وارسو رسميا.' },
+            { id: 'd1_34', cat: 'dates', unit: '1', year: 1991.9, term: '25 ديسمبر 1991', def: 'استقالة غورباتشوف والزوال الرسمي للاتحاد السوفييتي.' },
+
+            // ================= DATES: UNIT 2 =================
+            { id: 'd2_1', cat: 'dates', unit: '2', year: 1943.1, term: '03 فيفري 1943', def: 'تحرير بيان فيفري الموجه للحلفاء وحكومة فرنسا.' },
+            { id: 'd2_2', cat: 'dates', unit: '2', year: 1945.4, term: '08 ماي 1945', def: 'مجازر سطيف وقالمة وخراطة التي راح ضحيتها 45 ألف شهيد.' },
+            { id: 'd2_3', cat: 'dates', unit: '2', year: 1947.1, term: '15 فيفري 1947', def: 'إنشاء المنظمة الخاصة (L\'OS) ببوزريعة بغية التحضير للثورة.' },
+            { id: 'd2_4', cat: 'dates', unit: '2', year: 1947.7, term: '20 سبتمبر 1947', def: 'إصدار القانون الخاص أو "دستور الجزائر".' },
+            { id: 'd2_5', cat: 'dates', unit: '2', year: 1954.2, term: '23 مارس 1954', def: 'إنشاء اللجنة الثورية للوحدة والعمل (CRUA).' },
+            { id: 'd2_6', cat: 'dates', unit: '2', year: 1954.5, term: '23 جوان 1954', def: 'اجتماع لجنة الـ 22 في صالمبي (المدنية) بالعاصمة.' },
+            { id: 'd2_7', cat: 'dates', unit: '2', year: 1954.8, term: '23 أكتوبر 1954', def: 'اجتماع الرايس حميدو وإنشاء جبهة التحرير الوطني (لجنة الـ 06).' },
+            { id: 'd2_8', cat: 'dates', unit: '2', year: 1954.9, term: '01 نوفمبر 1954', def: 'اندلاع الثورة التحريرية في مختلف أنحاء التراب الوطني.' },
+            { id: 'd2_9', cat: 'dates', unit: '2', year: 1955.6, term: '20 أوت 1955', def: 'هجومات الشمال القسنطيني بقيادة زيغود يوسف.' },
+            { id: 'd2_10', cat: 'dates', unit: '2', year: 1956.1, term: '24 فيفري 1956', def: 'تأسيس الاتحاد العام للعمال الجزائريين (UGTA).' },
+            { id: 'd2_11', cat: 'dates', unit: '2', year: 1956.6, term: '20 أوت 1956', def: 'انعقاد مؤتمر الصومام بالقبائل وتنظيم الثورة.' },
+            { id: 'd2_12', cat: 'dates', unit: '2', year: 1956.8, term: '22 أكتوبر 1956', def: 'القرصنة الجوية التي استهدفت قادة الوفد الخارجي لجبهة التحرير الوطني.' },
+            { id: 'd2_13', cat: 'dates', unit: '2', year: 1957.1, term: '07 جانفي 1957', def: 'بداية معركة الجزائر وإضراب الثمانية أيام التاريخي (28 جانفي - 04 فيفري).' },
+            { id: 'd2_14', cat: 'dates', unit: '2', year: 1958.1, term: '08 فيفري 1958', def: 'قنبلة الطيران الفرنسي لقرية الساقية سيدي يوسف الحدودية التونسية.' },
+            { id: 'd2_15', cat: 'dates', unit: '2', year: 1958.7, term: '19 سبتمبر 1958', def: 'تأسيس الحكومة المؤقتة للجمهورية الجزائرية بالقاهرة برئاسة فرحات عباس.' },
+            { id: 'd2_16', cat: 'dates', unit: '2', year: 1958.8, term: '04 أكتوبر 1958', def: 'إعلان ديغول عن مشروع قسنطينة الإغرائي.' },
+            { id: 'd2_17', cat: 'dates', unit: '2', year: 1960.1, term: '13 فيفري 1960', def: 'فرنسا تفجر أول قنبلة ذرية في رقان بالصحراء الجزائرية.' },
+            { id: 'd2_18', cat: 'dates', unit: '2', year: 1960.9, term: '11 ديسمبر 1960', def: 'مظاهرات شعبية بالعاصمة وضواحيها دعما للوفد المفاوض.' },
+            { id: 'd2_19', cat: 'dates', unit: '2', year: 1961.8, term: '17 أكتوبر 1961', def: 'مظاهرات المغتربين الجزائريين بباريس وقمعها الوحشي.' },
+            { id: 'd2_20', cat: 'dates', unit: '2', year: 1962.2, term: '07 - 18 مارس 1962', def: 'مفاوضات إيفيان الثانية وتوقيع اتفاقيات الاستقلال.' },
+            { id: 'd2_21', cat: 'dates', unit: '2', year: 1962.3, term: '19 مارس 1962', def: 'وقف إطلاق النار وعيد النصر في الجزائر.' },
+            { id: 'd2_22', cat: 'dates', unit: '2', year: 1962.5, term: '01 جويلية 1962', def: 'تنظيم استفتاء تقرير المصير للشعب الجزائري.' },
+            { id: 'd2_23', cat: 'dates', unit: '2', year: 1962.6, term: '05 جويلية 1962', def: 'الإعلان الرسمي عن استقلال الجزائر.' },
+            { id: 'd2_24', cat: 'dates', unit: '2', year: 1962.8, term: '08 أكتوبر 1962', def: 'انضمام الجزائر إلى هيئة الأمم المتحدة.' },
+            { id: 'd2_25', cat: 'dates', unit: '2', year: 1965.5, term: '19 جوان 1965', def: 'التصحيح الثوري الذي قاده هواري بومدين ضد أحمد بن بلة.' },
+            { id: 'd2_26', cat: 'dates', unit: '2', year: 1988.8, term: '05 أكتوبر 1988', def: 'أحداث انتفاضة 5 أكتوبر بالجزائر.' },
+            { id: 'd2_27', cat: 'dates', unit: '2', year: 1989.1, term: '23 فيفري 1989', def: 'صدور الدستور الذي أقر التعددية الحزبية في الجزائر.' },
+
+            // ================= DATES: UNIT 3 =================
+            { id: 'd3_1', cat: 'dates', unit: '3', year: 1897, term: '29 أوت 1897', def: 'انعقاد مؤتمر بال بسويسرا وتأسيس الحركة الصهيونية بزعامة تيودور هرتزل.' },
+            { id: 'd3_2', cat: 'dates', unit: '3', year: 1917, term: '02 نوفمبر 1917', def: 'صدور وعد بلفور المشؤوم لإقامة وطن قومي لليهود في فلسطين.' },
+            { id: 'd3_3', cat: 'dates', unit: '3', year: 1945.2, term: '22 مارس 1945', def: 'تأسيس جامعة الدول العربية.' },
+            { id: 'd3_4', cat: 'dates', unit: '3', year: 1947.5, term: '15 أوت 1947', def: 'استقلال الهند وباكستان عن الاستعمار البريطاني.' },
+            { id: 'd3_5', cat: 'dates', unit: '3', year: 1947.9, term: '29 نوفمبر 1947', def: 'صدور القرار الأممي 181 الذي يعطي الشرعية لتقسيم فلسطين.' },
+            { id: 'd3_6', cat: 'dates', unit: '3', year: 1948.4, term: '15 ماي 1948', def: 'إعلان ديفيد بن غوريون قيام دولة إسرائيل واندلاع الحرب العربية الإسرائيلية.' },
+            { id: 'd3_7', cat: 'dates', unit: '3', year: 1952.5, term: '23 جويلية 1952', def: 'قيام الثورة المصرية ضد الملك فاروق (حركة الضباط الأحرار).' },
+            { id: 'd3_8', cat: 'dates', unit: '3', year: 1954.4, term: '07 ماي 1954', def: 'انتصار الفيتناميين بزعامة الجنرال جياب على الفرنسيين في معركة ديان بيان فو.' },
+            { id: 'd3_9', cat: 'dates', unit: '3', year: 1959.1, term: '08 جانفي 1959', def: 'دخول فيدال كاسترو هافانا وانتصار الثورة الكوبية.' },
+            { id: 'd3_10', cat: 'dates', unit: '3', year: 1963.4, term: '25 ماي 1963', def: 'تأسيس منظمة الوحدة الإفريقية بأديس أبابا.' },
+            { id: 'd3_11', cat: 'dates', unit: '3', year: 1964.4, term: '28 ماي 1964', def: 'إنشاء منظمة التحرير الفلسطينية بالقاهرة.' },
+            { id: 'd3_12', cat: 'dates', unit: '3', year: 1965.1, term: '01 جانفي 1965', def: 'إعلان انطلاق الثورة الفلسطينية المسلحة.' },
+            { id: 'd3_13', cat: 'dates', unit: '3', year: 1967.5, term: '05 جوان 1967', def: 'حرب الستة أيام بين العرب وإسرائيل (النكسة) وصدور القرار 242.' },
+            { id: 'd3_14', cat: 'dates', unit: '3', year: 1973.8, term: '06 أكتوبر 1973', def: 'اندلاع حرب رمضان (أكتوبر) بين العرب وإسرائيل وحظر تصدير النفط.' },
+            { id: 'd3_15', cat: 'dates', unit: '3', year: 1978.7, term: '17 سبتمبر 1978', def: 'توقيع اتفاقية كامب ديفيد بين مصر وإسرائيل.' },
+            { id: 'd3_16', cat: 'dates', unit: '3', year: 1982.5, term: '06 جوان 1982', def: 'الغزو الإسرائيلي للبنان وطرد المقاومة الفلسطينية منها.' },
+            { id: 'd3_17', cat: 'dates', unit: '3', year: 1987.9, term: '07 - 08 ديسمبر 1987', def: 'اندلاع الانتفاضة الفلسطينية الأولى.' },
+            { id: 'd3_18', cat: 'dates', unit: '3', year: 1988.9, term: '15 نوفمبر 1988', def: 'الإعلان عن قيام دولة فلسطين في مؤتمر الجزائر.' },
+            { id: 'd3_19', cat: 'dates', unit: '3', year: 1993.7, term: '13 سبتمبر 1993', def: 'توقيع اتفاقية السلام "غزة أريحا" بواشنطن.' }
+        ];
+
+        // =========================================================================
+        // 2. INTERACTIVE MAPS DATA (CUSTOM VECTOR MAPS FOR BAC CURRICULUM)
+        // =========================================================================
+        const MAPS_DATA = {
+            world_econ: {
+                title: 'خريطة عالم الشمال والجنوب والأقطاب الاقتصادية',
+                badge: 'جغرافيا • الوحدة 1 و 2',
+                svg: `
+                <svg viewBox="0 0 800 420" class="w-full h-auto select-none">
+                    <defs>
+                        <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#071124"/>
+                            <stop offset="100%" stop-color="#0c1d3d"/>
+                        </linearGradient>
+                    </defs>
+                    <rect width="800" height="420" fill="url(#oceanGrad)"/>
+                    <!-- Grid Lines -->
+                    <g stroke="rgba(255,255,255,0.06)" stroke-width="1">
+                        <line x1="0" y1="105" x2="800" y2="105"/><line x1="0" y1="210" x2="800" y2="210"/><line x1="0" y1="315" x2="800" y2="315"/>
+                        <line x1="200" y1="0" x2="200" y2="420"/><line x1="400" y1="0" x2="400" y2="420"/><line x1="600" y1="0" x2="600" y2="420"/>
+                    </g>
+                    <!-- Simplified Continents Shapes -->
+                    <!-- North America -->
+                    <path d="M60,55 L210,45 L245,115 L195,175 L155,195 L120,155 L75,110 Z" fill="#1e3a5f" stroke="#00BBF9" stroke-width="1.5"/>
+                    <!-- South America -->
+                    <path d="M195,215 L265,235 L285,310 L235,385 L205,365 L190,275 Z" fill="#2d1f3d" stroke="#F15BB5" stroke-width="1.5"/>
+                    <!-- Europe -->
+                    <path d="M355,55 L465,45 L480,125 L415,140 L360,130 Z" fill="#1e3a5f" stroke="#00BBF9" stroke-width="1.5"/>
+                    <!-- Russia / North Asia -->
+                    <path d="M475,40 L725,45 L745,125 L550,135 L480,125 Z" fill="#1e3a5f" stroke="#00BBF9" stroke-width="1.5"/>
+                    <!-- Africa -->
+                    <path d="M355,155 L455,155 L495,235 L445,345 L395,335 L350,235 Z" fill="#2d1f3d" stroke="#F15BB5" stroke-width="1.5"/>
+                    <!-- South & East Asia -->
+                    <path d="M490,135 L695,135 L715,225 L615,245 L525,215 Z" fill="#2d1f3d" stroke="#F15BB5" stroke-width="1.5"/>
+                    <!-- Australia & NZ (Included in North World!) -->
+                    <path d="M635,285 L725,285 L735,345 L645,350 Z" fill="#1e3a5f" stroke="#00F5D4" stroke-width="1.5"/>
+
+                    <!-- North-South Dividing Line (Brandt Line) -->
+                    <path d="M20,188 L185,192 L240,165 L345,148 L475,145 L585,165 L735,155 L750,265 L610,275 L615,375 L785,375"
+                          fill="none" stroke="#FEE440" stroke-width="3" stroke-dasharray="8,5"/>
+                    <text x="90" y="38" fill="#00F5D4" font-size="14" font-weight="bold">عالم الشمال المتطور (G8 + أستراليا ونيوزيلندا)</text>
+                    <text x="360" y="395" fill="#F15BB5" font-size="14" font-weight="bold">عالم الجنوب المتخلف السائر في طريق النمو</text>
+                    <text x="245" y="155" fill="#FEE440" font-size="11" font-weight="bold">الخط الفاصل بين الشمال والجنوب</text>
+                </svg>`,
+                pins: [
+                    { id: 'm1_p1', x: 165, y: 115, color: '#00F5D4', name: 'الولايات المتحدة وكندا (ALENA)', desc: 'أكبر قطب اقتصادي في عالم الشمال، يضم بورصة وول ستريت ومقر صندوق النقد الدولي والبنك العالمي بواشنطن.' },
+                    { id: 'm1_p2', x: 410, y: 95, color: '#00BBF9', name: 'الاتحاد الأوروبي وفيينا (مقر الأوبيك)', desc: 'قطب اقتصادي عالمي تأسس بمعاهدة روما 1957 وماستريخت 1992، وتضم فيينا مقر منظمة الأوبيك OPEC.' },
+                    { id: 'm1_p3', x: 695, y: 135, color: '#00F5D4', name: 'اليابان والتنينات الأربعة', desc: 'اليابان قاطرة آسيا الاقتصادية، وإلى جانبها التنينات الأربعة: كوريا الجنوبية، تايوان، هونغ كونغ، وسنغافورة.' },
+                    { id: 'm1_p4', x: 645, y: 215, color: '#FEE440', name: 'رابطة الآسيان ونمور الآسيان', desc: 'تأسست الآسيان عام 1967 ومقرها جاكرتا بإندونيسيا، وتضم نمور الآسيان: ماليزيا، إندونيسيا، الفلبين، وتايلاندا.' },
+                    { id: 'm1_p5', x: 685, y: 318, color: '#00F5D4', name: 'أستراليا ونيوزيلندا', desc: 'تقعان جغرافيا في نصف الكرة الجنوبي لكنهما تصنفان اقتصاديا ضمن عالم الشمال المتطور.' },
+                    { id: 'm1_p6', x: 415, y: 215, color: '#F15BB5', name: 'إفريقيا ومبادرة النيباد NEPAD', desc: 'تنتمي لعالم الجنوب وتأسست بها مبادرة النيباد سنة 2001 بلوزاكا بمبادرة من الجزائر ومصر وجنوب إفريقيا والسنغال ونيجيريا.' }
+                ]
+            },
+
+            cold_war: {
+                title: 'خريطة الأحلاف العسكرية وأزمات الحرب الباردة',
+                badge: 'تاريخ • الوحدة 1',
+                svg: `
+                <svg viewBox="0 0 800 420" class="w-full h-auto select-none">
+                    <rect width="800" height="420" fill="#090d1c"/>
+                    <g stroke="rgba(155,93,229,0.1)" stroke-width="1">
+                        <line x1="0" y1="140" x2="800" y2="140"/><line x1="0" y1="280" x2="800" y2="280"/>
+                        <line x1="266" y1="0" x2="266" y2="420"/><line x1="533" y1="0" x2="533" y2="420"/>
+                    </g>
+                    <!-- Western Bloc -->
+                    <path d="M55,60 L205,55 L235,130 L165,180 L90,145 Z" fill="#172b4d" stroke="#00BBF9" stroke-width="2"/>
+                    <path d="M340,65 L415,65 L415,135 L345,135 Z" fill="#172b4d" stroke="#00BBF9" stroke-width="2"/>
+                    <!-- Eastern Bloc (USSR + Warsaw Pact) -->
+                    <path d="M420,45 L725,45 L740,145 L520,150 L420,135 Z" fill="#3b1224" stroke="#F15BB5" stroke-width="2"/>
+                    <!-- Iron Curtain Line -->
+                    <line x1="418" y1="45" x2="418" y2="145" stroke="#FEE440" stroke-width="3.5" stroke-dasharray="6,4"/>
+                    <text x="365" y="36" fill="#FEE440" font-size="12" font-weight="bold">الستار الحديدي (برلين)</text>
+                    <!-- Middle East & Asia -->
+                    <path d="M430,155 L520,160 L515,220 L435,215 Z" fill="#231c3d" stroke="#9B5DE5" stroke-width="1.5"/>
+                    <path d="M530,155 L700,155 L710,255 L580,255 Z" fill="#231c3d" stroke="#9B5DE5" stroke-width="1.5"/>
+                </svg>`,
+                pins: [
+                    { id: 'm2_p1', x: 185, y: 175, color: '#F15BB5', name: 'كوبا (أزمة الصواريخ 1962)', desc: 'أخطر أزمات الحرب الباردة في أكتوبر 1962 بين كينيدي وخروتشوف بعد اكتشاف صواريخ نووية سوفياتية في كوبا.' },
+                    { id: 'm2_p2', x: 375, y: 98, color: '#00BBF9', name: 'بروكسل (مقر الحلف الأطلسي NATO)', desc: 'تأسس حلف الناتو في 04 أفريل 1949 بواشنطن ومقر قيادته بروكسل ببلجيكا لمواجهة المعسكر الشيوعي.' },
+                    { id: 'm2_p3', x: 418, y: 92, color: '#FEE440', name: 'برلين (الحصار 1948 والجدار 1961)', desc: 'بؤرة توتر رئيسية في أوروبا شهدت حصار برلين 1948 وبناء جدار برلين في 13 أوت 1961 وسقوطه في 09 نوفمبر 1989.' },
+                    { id: 'm2_p4', x: 465, y: 95, color: '#F15BB5', name: 'وارسو (مقر حلف وارسو 1955)', desc: 'تأسس حلف وارسو العسكري في 14 ماي 1955 بعاصمة بولونيا بقيادة الاتحاد السوفييتي ردا على الأحلاف الغربية.' },
+                    { id: 'm2_p5', x: 475, y: 182, color: '#9B5DE5', name: 'بغداد (حلف بغداد 1955)', desc: 'تأسس في 24 فبراير 1955 لتطويق السوفييت في الشرق الأوسط، وبعد انسحاب العراق 1958 نقل مقره لأنقرة (الحلف المركزي).' },
+                    { id: 'm2_p6', x: 665, y: 165, color: '#F15BB5', name: 'شبه الجزيرة الكورية (1950-1953)', desc: 'شهدت الحرب الكورية (1950-1953) وانتهت بتقسيم كوريا إلى شمالية شيوعية وجنوبية رأسمالية عند خط عرض 38.' },
+                    { id: 'm2_p7', x: 645, y: 225, color: '#00F5D4', name: 'مانيلا وباندونغ (جنوب شرق آسيا)', desc: 'في مانيلا تأسس حلف جنوب شرق آسيا SEATO (1954)، وفي باندونغ بإندونيسيا انعقد مؤتمر التضامن الأفرو-آسيوي (1955).' }
+                ]
+            },
+
+            algeria_rev: {
+                title: 'خريطة الثورة التحريرية الجزائرية (مؤتمر الصومام 1956)',
+                badge: 'تاريخ • الوحدة 2',
+                svg: `
+                <svg viewBox="0 0 800 420" class="w-full h-auto select-none">
+                    <rect width="800" height="420" fill="#071512"/>
+                    <!-- Algeria Simplified Map Silhouette -->
+                    <path d="M230,65 L515,45 L535,140 L585,245 L465,375 L345,355 L175,235 L205,135 Z"
+                          fill="#112b24" stroke="#10B981" stroke-width="2.5"/>
+                    <!-- Wilaya Boundaries -->
+                    <line x1="215" y1="115" x2="525" y2="105" stroke="rgba(16,185,129,0.45)" stroke-width="1.5" stroke-dasharray="4,4"/>
+                    <line x1="310" y1="60" x2="310" y2="112" stroke="rgba(16,185,129,0.45)" stroke-width="1.5"/>
+                    <line x1="395" y1="54" x2="395" y2="109" stroke="rgba(16,185,129,0.45)" stroke-width="1.5"/>
+                    <line x1="455" y1="50" x2="455" y2="107" stroke="rgba(16,185,129,0.45)" stroke-width="1.5"/>
+                    <line x1="360" y1="110" x2="385" y2="360" stroke="rgba(16,185,129,0.45)" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+                    <!-- Challe & Morice Electrified Lines -->
+                    <line x1="522" y1="45" x2="542" y2="145" stroke="#EF4444" stroke-width="4" stroke-dasharray="6,3"/>
+                    <text x="550" y="95" fill="#EF4444" font-size="12" font-weight="bold">خطا شال وموريس (الشرق)</text>
+                    <line x1="222" y1="68" x2="195" y2="145" stroke="#EF4444" stroke-width="4" stroke-dasharray="6,3"/>
+                    <text x="65" y="105" fill="#EF4444" font-size="12" font-weight="bold">خطا شال وموريس (الغرب)</text>
+                </svg>`,
+                pins: [
+                    { id: 'm3_p1', x: 482, y: 88, color: '#FEE440', name: 'الولاية الأولى: الأوراس النمامشة', desc: 'قادها البطل مصطفى بن بولعيد عند اندلاع الثورة في 01 نوفمبر 1954.' },
+                    { id: 'm3_p2', x: 430, y: 72, color: '#00F5D4', name: 'الولاية الثانية: الشمال القسنطيني', desc: 'قادها ديدوش مراد ثم زيغود يوسف الذي نظم هجومات 20 أوت 1955 التاريخية.' },
+                    { id: 'm3_p3', x: 375, y: 74, color: '#00BBF9', name: 'الولاية الثالثة: القبائل (مؤتمر الصومام)', desc: 'قادها كريم بلقاسم، واحتضنت وادي الصومام انعقاد مؤتمر الصومام في 20 أوت 1956.' },
+                    { id: 'm3_p4', x: 335, y: 80, color: '#9B5DE5', name: 'الولاية الرابعة: العاصمة وضواحيها', desc: 'قادها رابح بيطاط، وشهدت معركة الجزائر الكبرى (1957) ومظاهرات 11 ديسمبر 1960.' },
+                    { id: 'm3_p5', x: 265, y: 95, color: '#F15BB5', name: 'الولاية الخامسة: وهران والغرب الجزائري', desc: 'قادها الشهيد العربي بن مهيدي ثم العقيد هواري بومدين سنة 1957.' },
+                    { id: 'm3_p6', x: 435, y: 175, color: '#10B981', name: 'الولاية السادسة: الصحراء', desc: 'أُنشئت رسميا في مؤتمر الصومام 20 أوت 1956 بقيادة سي الحواس لتوسيع الثورة جنوبا.' },
+                    { id: 'm3_p7', x: 325, y: 245, color: '#EF4444', name: 'رقان (التفجيرات النووية 1960)', desc: 'فجرت فيها فرنسا الاستعمارية أول قنبلة ذرية في 13 فيفري 1960 بالصحراء الجزائرية.' }
+                ]
+            },
+
+            brazil_econ: {
+                title: 'خريطة التنظيم الاقتصادي والمجالي للبرازيل',
+                badge: 'جغرافيا • الوحدة 3',
+                svg: `
+                <svg viewBox="0 0 800 420" class="w-full h-auto select-none">
+                    <rect width="800" height="420" fill="#09131c"/>
+                    <!-- Brazil Map Silhouette -->
+                    <path d="M235,65 L415,45 L625,125 L605,225 L485,355 L395,385 L345,285 L215,185 Z"
+                          fill="#132a24" stroke="#00F5D4" stroke-width="2.5"/>
+                    <!-- Amazon Basin Region -->
+                    <ellipse cx="355" cy="135" rx="125" ry="55" fill="rgba(16,185,129,0.2)" stroke="#10B981" stroke-dasharray="5,4"/>
+                    <text x="305" y="138" fill="#10B981" font-size="13" font-weight="bold">حوض وغابة الأمازون (41%)</text>
+
+                    <!-- Drought Triangle (Northeast) -->
+                    <polygon points="535,115 615,135 565,195" fill="rgba(239,68,68,0.25)" stroke="#EF4444" stroke-width="2"/>
+                    <text x="585" y="105" fill="#EF4444" font-size="12" font-weight="bold">مثلث العطش</text>
+
+                    <!-- Vital Triangle (Southeast) -->
+                    <polygon points="465,245 545,275 495,315" fill="rgba(254,228,64,0.28)" stroke="#FEE440" stroke-width="2.5"/>
+                    <text x="555" y="295" fill="#FEE440" font-size="13" font-weight="bold">المثلث الحيوي</text>
+                </svg>`,
+                pins: [
+                    { id: 'm4_p1', x: 505, y: 282, color: '#FEE440', name: 'المثلث الحيوي (ريو - ساو باولو - برازيليا)', desc: 'يمتد في الجنوب الشرقي للبرازيل بين ريو دي جانيرو وساو باولو وبرازيليا، يتركز به السكان والأنشطة الاقتصادية (قلب الاقتصاد النابض).' },
+                    { id: 'm4_p2', x: 572, y: 152, color: '#EF4444', name: 'مثلث العطش (الشمال الشرقي)', desc: 'المنطقة الشمالية الشرقية من سواحل البرازيل، تتميز بقلة تساقط الأمطار والجفاف رغم وقوعها ضمن مناخ مداري رطب.' },
+                    { id: 'm4_p3', x: 355, y: 115, color: '#10B981', name: 'حوض وغابة الأمازون (رئة الأرض)', desc: 'هضبة شمال البرازيل (3.5 مليون كلم2 أي 41% من المساحة)، يخترقها نهر الأمازون (7025 كم) وتغطيها أكثف غابات العالم.' }
+                ]
+            }
+        };
+
+        // =========================================================================
+        // 3. STATE MANAGEMENT & LOCAL STORAGE
+        // =========================================================================
+        let state = {
+            xp: parseInt(localStorage.getItem('solvix_bac_xp')) || 0,
+            bestStreak: parseInt(localStorage.getItem('solvix_bac_streak')) || 0,
+            masteredIds: JSON.parse(localStorage.getItem('solvix_bac_mastered')) || [],
+            hardIds: JSON.parse(localStorage.getItem('solvix_bac_hard')) || [],
+            selectedCategory: 'all',
+            selectedUnit: 'all',
+            soundEnabled: localStorage.getItem('solvix_bac_sound') !== 'false',
+            currentView: 'home'
+        };
+
+        let quizState = { questions: [], currentIndex: 0, score: 0, correctCount: 0, streak: 0, timer: 25, timerInterval: null, answered: false };
+        let fcState = { deck: [], currentIndex: 0, isFlipped: false, isHardOnly: false };
+        let matchState = { pairs: [], selectedTerm: null, selectedDef: null, matchedCount: 0, seconds: 0, timerInterval: null };
+        let mapState = { currentMapKey: 'world_econ', playMode: 'explore', targetPin: null, score: 0 };
+        let detectiveState = { currentItem: null, clues: [], revealedCount: 1, options: [], answered: false };
+        let timelineState = { pool: [], ordered: [] };
+
+        // =========================================================================
+        // 4. SOUND SYNTHESIZER (WEB AUDIO API)
+        // =========================================================================
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!state.soundEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(540, now);
+                osc.frequency.exponentialRampToValueAtTime(760, now + 0.06);
+                gain.gain.setValueAtTime(0.07, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                osc.start(now);
+                osc.stop(now + 0.06);
+            } else if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.08);
+                osc.frequency.setValueAtTime(783.99, now + 0.16);
+                gain.gain.setValueAtTime(0.14, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.linearRampToValueAtTime(140, now + 0.25);
+                gain.gain.setValueAtTime(0.11, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'win') {
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.type = 'triangle';
+                    o.frequency.setValueAtTime(freq, now + idx * 0.1);
+                    g.gain.setValueAtTime(0.14, now + idx * 0.1);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.4);
+                    o.start(now + idx * 0.1);
+                    o.stop(now + idx * 0.1 + 0.4);
+                });
+            }
+        }
+
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            localStorage.setItem('solvix_bac_sound', state.soundEnabled);
+            updateSoundIcon();
+            if (state.soundEnabled) playSound('click');
+        }
+
+        function updateSoundIcon() {
+            document.getElementById('sound-icon').className = state.soundEnabled
+                ? 'fa-solid fa-volume-high text-neonCyan'
+                : 'fa-solid fa-volume-xmark text-slate-500';
+        }
+
+        // =========================================================================
+        // 5. NAVIGATION & GLOBAL BACK BUTTON (زر الرجوع)
+        // =========================================================================
+        function navigateTo(viewName) {
+            playSound('click');
+            clearInterval(quizState.timerInterval);
+            clearInterval(matchState.timerInterval);
+
+            const views = ['home', 'maps', 'detective', 'timeline', 'quiz', 'quiz-result', 'flashcards', 'match', 'explorer'];
+            views.forEach(v => document.getElementById('view-' + v).classList.add('hidden'));
+
+            document.getElementById('view-' + viewName).classList.remove('hidden');
+            state.currentView = viewName;
+
+            const backBtn = document.getElementById('global-back-btn');
+            if (viewName === 'home') {
+                backBtn.classList.add('hidden');
+                backBtn.classList.remove('flex');
+            } else {
+                backBtn.classList.remove('hidden');
+                backBtn.classList.add('flex');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goBack() {
+            navigateTo('home');
+        }
+
+        // =========================================================================
+        // 6. INITIALIZATION & STATS
+        // =========================================================================
+        function initApp() {
+            initParticleBackground();
+            updateSoundIcon();
+            updateStatsUI();
+            populateCategoryCounts();
+        }
+
+        function saveState() {
+            localStorage.setItem('solvix_bac_xp', state.xp);
+            localStorage.setItem('solvix_bac_streak', state.bestStreak);
+            localStorage.setItem('solvix_bac_mastered', JSON.stringify(state.masteredIds));
+            localStorage.setItem('solvix_bac_hard', JSON.stringify(state.hardIds));
+            updateStatsUI();
+        }
+
+        function updateStatsUI() {
+            document.getElementById('header-xp').textContent = state.xp;
+            document.getElementById('dash-xp').textContent = state.xp;
+            document.getElementById('dash-streak').textContent = state.bestStreak;
+            document.getElementById('header-mastered').textContent = state.masteredIds.length;
+            document.getElementById('header-hard-count').textContent = state.hardIds.length;
+            document.getElementById('card-hard-count').textContent = state.hardIds.length;
+
+            const percent = Math.round((state.masteredIds.length / CURRICULUM_DATA.length) * 100);
+            document.getElementById('mastery-percent').textContent = percent + '%';
+            document.getElementById('mastery-bar').style.width = percent + '%';
+
+            const rankBadge = document.getElementById('user-rank-badge');
+            if (state.xp >= 2500) rankBadge.textContent = 'أسطورة البكالوريا 👑';
+            else if (state.xp >= 1200) rankBadge.textContent = 'مؤرخ وجغرافي خبير 🌟';
+            else if (state.xp >= 450) rankBadge.textContent = 'طالب متفوق 🚀';
+            else rankBadge.textContent = 'مبتدئ طموح 🎯';
+        }
+
+        function populateCategoryCounts() {
+            const geoCount = CURRICULUM_DATA.filter(i => i.cat === 'geo_terms').length;
+            const histCount = CURRICULUM_DATA.filter(i => i.cat === 'hist_terms').length;
+            const charCount = CURRICULUM_DATA.filter(i => i.cat === 'characters').length;
+            const dateCount = CURRICULUM_DATA.filter(i => i.cat === 'dates').length;
+
+            document.getElementById('stat-geo-count').textContent = geoCount;
+            document.getElementById('stat-hist-count').textContent = histCount;
+            document.getElementById('stat-char-count').textContent = charCount;
+            document.getElementById('stat-date-count').textContent = dateCount;
+
+            document.getElementById('count-cat-all').textContent = CURRICULUM_DATA.length;
+            document.getElementById('count-cat-geo').textContent = geoCount;
+            document.getElementById('count-cat-hist').textContent = histCount;
+            document.getElementById('count-cat-char').textContent = charCount;
+            document.getElementById('count-cat-date').textContent = dateCount;
+        }
+
+        function showToast(msg, iconClass = 'fa-circle-info text-neonCyan') {
+            const box = document.getElementById('toast-box');
+            document.getElementById('toast-text').textContent = msg;
+            document.getElementById('toast-icon').className = 'fa-solid ' + iconClass + ' text-lg';
+            box.classList.remove('opacity-0', 'translate-y-4');
+            setTimeout(() => box.classList.add('opacity-0', 'translate-y-4'), 2700);
+        }
+
+        function setCategory(cat) {
+            playSound('click');
+            state.selectedCategory = cat;
+            document.querySelectorAll('.cat-card').forEach(btn => {
+                if (btn.dataset.cat === cat) {
+                    btn.classList.add('border-2', 'border-neonCyan', 'bg-neonCyan/10');
+                    btn.classList.remove('border-white/10', 'bg-slate-900/60');
+                } else {
+                    btn.classList.remove('border-2', 'border-neonCyan', 'bg-neonCyan/10');
+                    btn.classList.add('border', 'border-white/10', 'bg-slate-900/60');
+                }
+            });
+        }
+
+        function setUnitFilter(unit) {
+            playSound('click');
+            state.selectedUnit = unit;
+            document.querySelectorAll('.unit-btn').forEach(btn => {
+                btn.className = btn.dataset.unit === unit
+                    ? 'unit-btn active px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-neonCyan text-darkBg transition'
+                    : 'unit-btn px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold bg-slate-800/90 text-slate-300 hover:bg-slate-700 transition';
+            });
+        }
+
+        function getFilteredItems() {
+            return CURRICULUM_DATA.filter(item => {
+                const catMatch = state.selectedCategory === 'all' || item.cat === state.selectedCategory;
+                const unitMatch = state.selectedUnit === 'all' || item.unit === state.selectedUnit;
+                return catMatch && unitMatch;
+            });
+        }
+
+        function getCategoryLabel(cat) {
+            return {
+                'geo_terms': 'مصطلحات الجغرافيا',
+                'hist_terms': 'مصطلحات التاريخ',
+                'characters': 'شخصيات التاريخ',
+                'dates': 'تواريخ ومعالم'
+            }[cat] || 'عام';
+        }
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function markAsHard(id) {
+            if (!state.hardIds.includes(id)) {
+                state.hardIds.push(id);
+                saveState();
+            }
+        }
+
+        // =========================================================================
+        // 7. INTERACTIVE MAPS & PIN-DROP CHALLENGE LOGIC
+        // =========================================================================
+        function startMapsMode() {
+            navigateTo('maps');
+            selectMap('world_econ');
+        }
+
+        function selectMap(mapKey) {
+            playSound('click');
+            mapState.currentMapKey = mapKey;
+            document.querySelectorAll('.map-tab-btn').forEach(btn => {
+                if (btn.dataset.map === mapKey) {
+                    btn.classList.add('border-2', 'border-neonBlue', 'bg-neonBlue/15');
+                    btn.classList.remove('border', 'border-white/10', 'bg-slate-900/70');
+                } else {
+                    btn.classList.remove('border-2', 'border-neonBlue', 'bg-neonBlue/15');
+                    btn.classList.add('border', 'border-white/10', 'bg-slate-900/70');
+                }
+            });
+            renderMap();
+            if (mapState.playMode === 'quiz') nextMapQuizQuestion();
+        }
+
+        function setMapPlayMode(mode) {
+            playSound('click');
+            mapState.playMode = mode;
+            const expBtn = document.getElementById('map-mode-explore-btn');
+            const quizBtn = document.getElementById('map-mode-quiz-btn');
+            const banner = document.getElementById('map-quiz-banner');
+
+            if (mode === 'explore') {
+                expBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-neonBlue text-darkBg transition';
+                quizBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-slate-300 hover:text-white transition';
+                banner.classList.add('hidden');
+            } else {
+                quizBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-neonGold text-darkBg transition';
+                expBtn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold text-slate-300 hover:text-white transition';
+                banner.classList.remove('hidden');
+                nextMapQuizQuestion();
+            }
+            renderMap();
+        }
+
+        function renderMap() {
+            const mapObj = MAPS_DATA[mapState.currentMapKey];
+            const container = document.getElementById('svg-map-container');
+            container.innerHTML = mapObj.svg;
+
+            const svgEl = container.querySelector('svg');
+            const pillsBox = document.getElementById('map-locations-pills');
+            pillsBox.innerHTML = '';
+
+            document.getElementById('map-info-badge').textContent = mapObj.badge;
+            document.getElementById('map-info-title').textContent = mapObj.title;
+            document.getElementById('map-info-desc').textContent = 'انقر على أي نقطة مضيئة فوق الخريطة لعرض تفاصيلها الدقيقة كما وردت في المنهاج.';
+            document.getElementById('map-info-extra').classList.add('hidden');
+
+            mapObj.pins.forEach((pin, idx) => {
+                // Create SVG Pin Group
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                g.setAttribute('class', 'map-pin');
+                g.onclick = () => handleMapPinClick(pin);
+
+                const outerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                outerCircle.setAttribute('cx', pin.x);
+                outerCircle.setAttribute('cy', pin.y);
+                outerCircle.setAttribute('r', '14');
+                outerCircle.setAttribute('fill', pin.color);
+                outerCircle.setAttribute('fill-opacity', '0.28');
+
+                const innerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                innerCircle.setAttribute('cx', pin.x);
+                innerCircle.setAttribute('cy', pin.y);
+                innerCircle.setAttribute('r', '7');
+                innerCircle.setAttribute('fill', pin.color);
+                innerCircle.setAttribute('stroke', '#ffffff');
+                innerCircle.setAttribute('stroke-width', '2');
+
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('x', pin.x);
+                label.setAttribute('y', pin.y - 14);
+                label.setAttribute('text-anchor', 'middle');
+                label.setAttribute('fill', '#ffffff');
+                label.setAttribute('font-size', '11');
+                label.setAttribute('font-weight', 'bold');
+                // Hide text labels during quiz mode so student tests memory!
+                label.textContent = mapState.playMode === 'explore' ? pin.name.split('(')[0].trim() : `؟ (${idx + 1})`;
+
+                g.appendChild(outerCircle);
+                g.appendChild(innerCircle);
+                g.appendChild(label);
+                svgEl.appendChild(g);
+
+                // Add pill button in explore mode
+                if (mapState.playMode === 'explore') {
+                    const pill = document.createElement('button');
+                    pill.className = 'px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-white/10 transition';
+                    pill.textContent = pin.name;
+                    pill.onclick = () => handleMapPinClick(pin);
+                    pillsBox.appendChild(pill);
+                }
+            });
+        }
+
+        function handleMapPinClick(pin) {
+            if (mapState.playMode === 'explore') {
+                playSound('click');
+                document.getElementById('map-info-title').textContent = pin.name;
+                document.getElementById('map-info-desc').textContent = pin.desc;
+                const extra = document.getElementById('map-info-extra');
+                extra.textContent = '✓ معلم أساسي مقرر في امتحان البكالوريا';
+                extra.classList.remove('hidden');
+            } else {
+                // Quiz Mode check
+                if (!mapState.targetPin) return;
+                if (pin.id === mapState.targetPin.id) {
+                    playSound('correct');
+                    mapState.score += 20;
+                    state.xp += 20;
+                    saveState();
+                    document.getElementById('map-quiz-score').textContent = mapState.score;
+                    document.getElementById('map-info-title').textContent = 'إجابة صحيحة! ' + pin.name;
+                    document.getElementById('map-info-desc').textContent = pin.desc;
+                    confetti({ particleCount: 40, spread: 60, origin: { y: 0.7 } });
+                    showToast('ممتاز! حددت الموقع بدقة (+20 نقطة)', 'fa-check-circle text-emerald-400');
+                    setTimeout(() => nextMapQuizQuestion(), 1100);
+                } else {
+                    playSound('wrong');
+                    showToast(`خطأ! هذا الموقع هو: ${pin.name}`, 'fa-circle-xmark text-red-400');
+                }
+            }
+        }
+
+        function nextMapQuizQuestion() {
+            const pins = MAPS_DATA[mapState.currentMapKey].pins;
+            const randomPin = pins[Math.floor(Math.random() * pins.length)];
+            mapState.targetPin = randomPin;
+            document.getElementById('map-quiz-target-text').textContent = `أين يقع: « ${randomPin.name} » ؟`;
+        }
+
+        // =========================================================================
+        // 8. IDENTITY DETECTIVE MODE (3 PROGRESSIVE CLUES)
+        // =========================================================================
+        function startDetectiveMode() {
+            const pool = getFilteredItems();
+            if (pool.length < 4) {
+                showToast('اختر قسماً يحتوي على 4 عناصر على الأقل!', 'fa-triangle-exclamation text-neonGold');
+                return;
+            }
+            navigateTo('detective');
+            nextDetectiveRound();
+        }
+
+        function nextDetectiveRound() {
+            const pool = getFilteredItems();
+            const item = pool[Math.floor(Math.random() * pool.length)];
+
+            // Generate 3 progressive clues from the item's definition & metadata
+            const words = item.def.split(' ');
+            const mid = Math.ceil(words.length / 2);
+            const clue1 = `التصنيف: ينتمي إلى « ${getCategoryLabel(item.cat)} » ضمن مقررات الوحدة ${item.unit}.`;
+            const clue2 = `تلميح إضافي: ${words.slice(0, mid).join(' ')}...`;
+            const clue3 = `التعريف الكامل: ${item.def}`;
+
+            let distractors = CURRICULUM_DATA.filter(x => x.id !== item.id && x.cat === item.cat);
+            if (distractors.length < 3) distractors = CURRICULUM_DATA.filter(x => x.id !== item.id);
+            const options = shuffleArray([item, ...shuffleArray(distractors).slice(0, 3)]);
+
+            detectiveState = {
+                currentItem: item,
+                clues: [clue1, clue2, clue3],
+                revealedCount: 1,
+                options,
+                answered: false
+            };
+
+            renderDetectiveUI();
+        }
+
+        function renderDetectiveUI() {
+            const { currentItem, clues, revealedCount, options } = detectiveState;
+            const potentialXP = revealedCount === 1 ? 30 : revealedCount === 2 ? 20 : 10;
+
+            document.getElementById('detective-potential-xp').textContent = potentialXP;
+            document.getElementById('detective-cat-badge').textContent = `${getCategoryLabel(currentItem.cat)} • الوحدة ${currentItem.unit}`;
+            document.getElementById('detective-clue-count').textContent = revealedCount;
+            document.getElementById('detective-next-round').classList.add('hidden');
+
+            const nextClueBtn = document.getElementById('detective-next-clue-btn');
+            nextClueBtn.disabled = revealedCount >= 3 || detectiveState.answered;
+            nextClueBtn.classList.toggle('opacity-40', revealedCount >= 3 || detectiveState.answered);
+
+            const cluesBox = document.getElementById('detective-clues-list');
+            cluesBox.innerHTML = '';
+            for (let i = 0; i < revealedCount; i++) {
+                const div = document.createElement('div');
+                div.className = 'p-4 rounded-2xl bg-slate-900/85 border border-neonGold/30 text-sm sm:text-base font-tajawal text-slate-100 animate-pop-in flex items-start gap-3';
+                div.innerHTML = `<span class="px-2.5 py-0.5 rounded-lg bg-neonGold/20 text-neonGold font-black text-xs shrink-0">تلميح ${i + 1}</span><span>${clues[i]}</span>`;
+                cluesBox.appendChild(div);
+            }
+
+            const optsBox = document.getElementById('detective-options');
+            optsBox.innerHTML = '';
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option p-4 rounded-2xl bg-slate-900/80 border border-white/15 font-extrabold text-sm sm:text-base text-white text-center';
+                btn.textContent = opt.term;
+                btn.onclick = () => checkDetectiveAnswer(btn, opt.id === currentItem.id);
+                optsBox.appendChild(btn);
+            });
+        }
+
+        function revealNextDetectiveClue() {
+            if (detectiveState.revealedCount < 3 && !detectiveState.answered) {
+                playSound('click');
+                detectiveState.revealedCount++;
+                renderDetectiveUI();
+            }
+        }
+
+        function checkDetectiveAnswer(btn, isCorrect) {
+            if (detectiveState.answered) return;
+            detectiveState.answered = true;
+
+            const allBtns = document.querySelectorAll('#detective-options button');
+            allBtns.forEach((b, idx) => {
+                b.disabled = true;
+                if (detectiveState.options[idx].id === detectiveState.currentItem.id) {
+                    b.classList.add('correct');
+                }
+            });
+
+            if (isCorrect) {
+                playSound('correct');
+                const earned = detectiveState.revealedCount === 1 ? 30 : detectiveState.revealedCount === 2 ? 20 : 10;
+                state.xp += earned;
+                saveState();
+                confetti({ particleCount: 50, spread: 65, origin: { y: 0.7 } });
+                showToast(`ذكي جداً! كشفت الهوية وربحت +${earned} نقطة`, 'fa-user-secret text-neonGold');
+            } else {
+                playSound('wrong');
+                btn.classList.add('wrong');
+                markAsHard(detectiveState.currentItem.id);
+                showToast(`للأسف خطأ! الإجابة هي: ${detectiveState.currentItem.term}`, 'fa-circle-xmark text-red-400');
+            }
+
+            document.getElementById('detective-next-round').classList.remove('hidden');
+        }
+
+        // =========================================================================
+        // 9. TIMELINE CHRONOLOGY BUILDER MODE
+        // =========================================================================
+        function startTimelineMode() {
+            let dateItems = CURRICULUM_DATA.filter(i => i.cat === 'dates' && (state.selectedUnit === 'all' || i.unit === state.selectedUnit));
+            if (dateItems.length < 5) dateItems = CURRICULUM_DATA.filter(i => i.cat === 'dates');
+
+            navigateTo('timeline');
+            const selected = shuffleArray(dateItems).slice(0, 5);
+            timelineState.pool = [...selected];
+            timelineState.ordered = [];
+            renderTimelineUI();
+        }
+
+        function renderTimelineUI() {
+            const poolBox = document.getElementById('timeline-pool');
+            const orderedBox = document.getElementById('timeline-ordered');
+            poolBox.innerHTML = '';
+            orderedBox.innerHTML = '';
+
+            timelineState.pool.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'p-3.5 rounded-2xl bg-slate-900/90 border border-white/15 hover:border-neonPink cursor-pointer transition text-xs sm:text-sm font-tajawal text-white flex items-center justify-between gap-2';
+                div.innerHTML = `<span>${item.def}</span><i class="fa-solid fa-plus text-neonPink shrink-0"></i>`;
+                div.onclick = () => {
+                    playSound('click');
+                    timelineState.pool = timelineState.pool.filter(x => x.id !== item.id);
+                    timelineState.ordered.push(item);
+                    renderTimelineUI();
+                };
+                poolBox.appendChild(div);
+            });
+
+            if (timelineState.ordered.length === 0) {
+                orderedBox.innerHTML = `<div class="h-48 border-2 border-dashed border-white/10 rounded-2xl flex items-center justify-center text-xs text-slate-500">انقر على الحدث الأقدم زمنياً لإضافته هنا أولاً...</div>`;
+            } else {
+                timelineState.ordered.forEach((item, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3.5 rounded-2xl bg-neonCyan/10 border border-neonCyan/40 text-xs sm:text-sm font-tajawal text-white flex items-center justify-between gap-2 animate-pop-in';
+                    div.innerHTML = `<div class="flex items-center gap-2"><span class="w-6 h-6 rounded-lg bg-neonCyan text-darkBg font-black flex items-center justify-center text-xs shrink-0">${idx + 1}</span><span>${item.def}</span></div><i class="fa-solid fa-xmark text-slate-400 hover:text-red-400"></i>`;
+                    div.onclick = () => {
+                        playSound('click');
+                        timelineState.ordered = timelineState.ordered.filter(x => x.id !== item.id);
+                        timelineState.pool.push(item);
+                        renderTimelineUI();
+                    };
+                    orderedBox.appendChild(div);
+                });
+            }
+
+            document.getElementById('timeline-check-btn').disabled = timelineState.ordered.length !== 5;
+        }
+
+        function resetTimelineSelection() {
+            playSound('click');
+            timelineState.pool = shuffleArray([...timelineState.pool, ...timelineState.ordered]);
+            timelineState.ordered = [];
+            renderTimelineUI();
+        }
+
+        function checkTimelineOrder() {
+            let isCorrect = true;
+            for (let i = 0; i < timelineState.ordered.length - 1; i++) {
+                if (timelineState.ordered[i].year > timelineState.ordered[i + 1].year) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+
+            const orderedBox = document.getElementById('timeline-ordered');
+            orderedBox.innerHTML = '';
+            const sortedCorrect = [...timelineState.ordered].sort((a, b) => a.year - b.year);
+
+            sortedCorrect.forEach((item, idx) => {
+                const userPickedCorrectly = timelineState.ordered[idx].id === item.id;
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-2xl border ${userPickedCorrectly ? 'bg-emerald-500/20 border-emerald-500' : 'bg-rose-500/20 border-rose-500'} text-xs sm:text-sm font-tajawal`;
+                div.innerHTML = `<div class="font-black text-neonGold mb-0.5">${idx + 1}. ${item.term}</div><div class="text-slate-200">${item.def}</div>`;
+                orderedBox.appendChild(div);
+            });
+
+            if (isCorrect) {
+                playSound('win');
+                state.xp += 35;
+                saveState();
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+                showToast('عبقري! الترتيب الزمني صحيح 100% (+35 نقطة)', 'fa-trophy text-neonGold');
+            } else {
+                playSound('wrong');
+                showToast('يوجد خلل في الترتيب! تم عرض الترتيب الصحيح بالتواريخ للمراجعة.', 'fa-circle-xmark text-red-400');
+            }
+            document.getElementById('timeline-check-btn').disabled = true;
+        }
+
+        // =========================================================================
+        // 10. QUIZ MODE LOGIC
+        // =========================================================================
+        function startQuizMode() {
+            const pool = getFilteredItems();
+            if (pool.length < 4) {
+                showToast('يرجى اختيار قسم يحتوي على 4 عناصر على الأقل!', 'fa-triangle-exclamation text-neonGold');
+                return;
+            }
+
+            const selected = shuffleArray(pool).slice(0, Math.min(10, pool.length));
+            quizState.questions = selected.map(item => {
+                const askDefinition = Math.random() > 0.35;
+                let sameCatPool = CURRICULUM_DATA.filter(x => x.id !== item.id && x.cat === item.cat);
+                if (sameCatPool.length < 3) sameCatPool = CURRICULUM_DATA.filter(x => x.id !== item.id);
+                const distractors = shuffleArray(sameCatPool).slice(0, 3);
+
+                if (askDefinition) {
+                    return {
+                        item,
+                        question: item.cat === 'dates'
+                            ? `ماذا حدث في التاريخ التالي: « ${item.term} » ؟`
+                            : item.cat === 'characters'
+                            ? `من هو / ما أبرز إنجازات الشخصية: « ${item.term} » ؟`
+                            : `ما هو التعريف الصحيح لمصطلح: « ${item.term} » ؟`,
+                        options: shuffleArray([{ text: item.def, isCorrect: true }, ...distractors.map(d => ({ text: d.def, isCorrect: false }))])
+                    };
+                } else {
+                    return {
+                        item,
+                        question: `إلى أي مصطلح أو شخصية أو تاريخ يشير الوصف التالي:\n« ${item.def} »`,
+                        options: shuffleArray([{ text: item.term, isCorrect: true }, ...distractors.map(d => ({ text: d.term, isCorrect: false }))])
+                    };
+                }
+            });
+
+            quizState.currentIndex = 0;
+            quizState.score = 0;
+            quizState.correctCount = 0;
+            quizState.streak = 0;
+
+            navigateTo('quiz');
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            clearInterval(quizState.timerInterval);
+            quizState.answered = false;
+            quizState.timer = 25;
+
+            const qObj = quizState.questions[quizState.currentIndex];
+            const total = quizState.questions.length;
+
+            document.getElementById('quiz-q-num').textContent = quizState.currentIndex + 1;
+            document.getElementById('quiz-q-total').textContent = total;
+            document.getElementById('quiz-score').textContent = quizState.score;
+            document.getElementById('quiz-progress-bar').style.width = `${((quizState.currentIndex + 1) / total) * 100}%`;
+            document.getElementById('quiz-category-tag').textContent = `${getCategoryLabel(qObj.item.cat)} • الوحدة ${qObj.item.unit}`;
+            document.getElementById('quiz-question-text').textContent = qObj.question;
+            document.getElementById('quiz-feedback').classList.add('hidden');
+
+            const optionsDiv = document.getElementById('quiz-options');
+            optionsDiv.innerHTML = '';
+            const letters = ['أ', 'ب', 'ج', 'د'];
+
+            qObj.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option w-full text-right p-4 rounded-2xl bg-slate-900/80 border border-white/15 flex items-start gap-3 text-sm sm:text-base font-tajawal';
+                btn.innerHTML = `<span class="w-7 h-7 rounded-lg bg-white/10 text-neonCyan font-bold flex items-center justify-center shrink-0 mt-0.5">${letters[idx]}</span><span class="leading-relaxed">${opt.text}</span>`;
+                btn.onclick = () => handleQuizAnswer(btn, opt.isCorrect);
+                optionsDiv.appendChild(btn);
+            });
+
+            document.getElementById('quiz-timer').textContent = quizState.timer;
+            quizState.timerInterval = setInterval(() => {
+                quizState.timer--;
+                document.getElementById('quiz-timer').textContent = quizState.timer;
+                if (quizState.timer <= 0) {
+                    clearInterval(quizState.timerInterval);
+                    handleQuizTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleQuizAnswer(selectedBtn, isCorrect) {
+            if (quizState.answered) return;
+            quizState.answered = true;
+            clearInterval(quizState.timerInterval);
+
+            const qObj = quizState.questions[quizState.currentIndex];
+            document.querySelectorAll('#quiz-options button').forEach((btn, idx) => {
+                btn.disabled = true;
+                if (qObj.options[idx].isCorrect) btn.classList.add('correct');
+            });
+
+            const feedbackBox = document.getElementById('quiz-feedback');
+            const feedbackMsg = document.getElementById('quiz-feedback-msg');
+            feedbackBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                playSound('correct');
+                quizState.streak++;
+                quizState.correctCount++;
+                const bonus = quizState.streak >= 3 ? 25 : 15;
+                quizState.score += bonus;
+                state.xp += bonus;
+                if (quizState.streak > state.bestStreak) state.bestStreak = quizState.streak;
+                saveState();
+
+                feedbackMsg.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-xl"></i> <span class="text-emerald-300">إجابة ممتازة! (+${bonus} نقطة)</span>`;
+                if (quizState.streak >= 2) {
+                    document.getElementById('quiz-streak-badge').classList.remove('hidden');
+                    document.getElementById('quiz-streak').textContent = quizState.streak;
+                }
+                confetti({ particleCount: 35, spread: 55, origin: { y: 0.7 } });
+            } else {
+                playSound('wrong');
+                selectedBtn.classList.add('wrong');
+                markAsHard(qObj.item.id);
+                document.getElementById('quiz-card').classList.add('animate-shake');
+                setTimeout(() => document.getElementById('quiz-card').classList.remove('animate-shake'), 500);
+                quizState.streak = 0;
+                document.getElementById('quiz-streak-badge').classList.add('hidden');
+                feedbackMsg.innerHTML = `<i class="fa-solid fa-circle-xmark text-red-400 text-xl"></i> <span class="text-red-300">إجابة خاطئة! تمت إضافتها تلقائياً لحقيبة الصعوبات.</span>`;
+            }
+            document.getElementById('quiz-score').textContent = quizState.score;
+        }
+
+        function handleQuizTimeout() {
+            if (quizState.answered) return;
+            quizState.answered = true;
+            playSound('wrong');
+            const qObj = quizState.questions[quizState.currentIndex];
+            markAsHard(qObj.item.id);
+            document.querySelectorAll('#quiz-options button').forEach((btn, idx) => {
+                btn.disabled = true;
+                if (qObj.options[idx].isCorrect) btn.classList.add('correct');
+            });
+            quizState.streak = 0;
+            document.getElementById('quiz-streak-badge').classList.add('hidden');
+            document.getElementById('quiz-feedback').classList.remove('hidden');
+            document.getElementById('quiz-feedback-msg').innerHTML = `<i class="fa-solid fa-hourglass-end text-amber-400 text-xl"></i> <span class="text-amber-300">انتهى الوقت!</span>`;
+        }
+
+        function nextQuizQuestion() {
+            playSound('click');
+            quizState.currentIndex++;
+            if (quizState.currentIndex < quizState.questions.length) renderQuizQuestion();
+            else showQuizResults();
+        }
+
+        function showQuizResults() {
+            playSound('win');
+            navigateTo('quiz-result');
+            const total = quizState.questions.length;
+            const accuracy = Math.round((quizState.correctCount / total) * 100);
+            document.getElementById('res-correct').textContent = `${quizState.correctCount}/${total}`;
+            document.getElementById('res-xp').textContent = quizState.score;
+            document.getElementById('res-accuracy').textContent = accuracy;
+            if (accuracy >= 80) confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+        }
+
+        // =========================================================================
+        // 11. 3D FLASHCARDS & SPACED REPETITION DIFFICULTY DECK
+        // =========================================================================
+        function startFlashcardsMode(hardOnly = false) {
+            fcState.isHardOnly = hardOnly;
+            navigateTo('flashcards');
+            filterFlashcards();
+        }
+
+        function startSpacedRepetitionMode() {
+            if (state.hardIds.length === 0) {
+                showToast('حقيبة الصعوبات فارغة حالياً! أخطئ في سؤال أو حدد بطاقة كـ "صعبة" لتظهر هنا.', 'fa-brain text-rose-400');
+                return;
+            }
+            startFlashcardsMode(true);
+        }
+
+        function filterFlashcards() {
+            let items = fcState.isHardOnly
+                ? CURRICULUM_DATA.filter(i => state.hardIds.includes(i.id))
+                : getFilteredItems();
+
+            const hideMastered = document.getElementById('fc-hide-mastered').checked;
+            if (!fcState.isHardOnly && hideMastered) {
+                items = items.filter(i => !state.masteredIds.includes(i.id));
+            }
+            if (items.length === 0) {
+                items = getFilteredItems();
+                document.getElementById('fc-hide-mastered').checked = false;
+                fcState.isHardOnly = false;
+            }
+
+            document.getElementById('fc-mode-label').textContent = fcState.isHardOnly ? '🔥 مراجعة الصعوبات:' : 'البطاقة';
+            fcState.deck = items;
+            fcState.currentIndex = 0;
+            fcState.isFlipped = false;
+            renderFlashcard();
+        }
+
+        function shuffleFlashcards() {
+            playSound('click');
+            fcState.deck = shuffleArray(fcState.deck);
+            fcState.currentIndex = 0;
+            renderFlashcard();
+        }
+
+        function renderFlashcard() {
+            document.getElementById('flashcard-el').classList.remove('flipped');
+            fcState.isFlipped = false;
+
+            const item = fcState.deck[fcState.currentIndex];
+            document.getElementById('fc-current').textContent = fcState.currentIndex + 1;
+            document.getElementById('fc-total').textContent = fcState.deck.length;
+            document.getElementById('fc-front-badge').textContent = getCategoryLabel(item.cat);
+            document.getElementById('fc-unit-badge').textContent = `الوحدة ${item.unit}`;
+            document.getElementById('fc-front-text').textContent = item.term;
+            document.getElementById('fc-back-text').textContent = item.def;
+
+            const isMastered = state.masteredIds.includes(item.id);
+            const isHard = state.hardIds.includes(item.id);
+
+            document.getElementById('fc-mastered-indicator').classList.toggle('hidden', !isMastered);
+            document.getElementById('fc-hard-indicator').classList.toggle('hidden', !isHard);
+
+            document.getElementById('fc-master-btn-text').textContent = isMastered ? 'محفوظة ✓' : 'حفظتها (أعرفها)';
+            document.getElementById('fc-hard-btn-text').textContent = isHard ? 'في الصعوبات (إزالة)' : 'تحتاج مراجعة (صعبة)';
+        }
+
+        function flipCard() {
+            playSound('click');
+            fcState.isFlipped = !fcState.isFlipped;
+            document.getElementById('flashcard-el').classList.toggle('flipped');
+        }
+
+        function nextFlashcard() {
+            playSound('click');
+            fcState.currentIndex = (fcState.currentIndex + 1) % fcState.deck.length;
+            renderFlashcard();
+        }
+
+        function prevFlashcard() {
+            playSound('click');
+            fcState.currentIndex = (fcState.currentIndex - 1 + fcState.deck.length) % fcState.deck.length;
+            renderFlashcard();
+        }
+
+        function toggleMasterCurrentCard() {
+            const item = fcState.deck[fcState.currentIndex];
+            const idx = state.masteredIds.indexOf(item.id);
+            if (idx === -1) {
+                state.masteredIds.push(item.id);
+                state.hardIds = state.hardIds.filter(x => x !== item.id);
+                state.xp += 10;
+                playSound('correct');
+                showToast('تم الحفظ بنجاح (+10 نقاط)', 'fa-check-circle text-emerald-400');
+            } else {
+                state.masteredIds.splice(idx, 1);
+                playSound('click');
+            }
+            saveState();
+            renderFlashcard();
+        }
+
+        function toggleHardCurrentCard() {
+            const item = fcState.deck[fcState.currentIndex];
+            const idx = state.hardIds.indexOf(item.id);
+            if (idx === -1) {
+                state.hardIds.push(item.id);
+                state.masteredIds = state.masteredIds.filter(x => x !== item.id);
+                playSound('wrong');
+                showToast('تمت إضافتها إلى حقيبة الصعوبات للمراجعة المركّزة', 'fa-fire text-rose-400');
+            } else {
+                state.hardIds.splice(idx, 1);
+                playSound('click');
+            }
+            saveState();
+            renderFlashcard();
+        }
+
+        // =========================================================================
+        // 12. MATCHING GAME MODE
+        // =========================================================================
+        function startMatchMode() {
+            const pool = getFilteredItems();
+            if (pool.length < 5) {
+                showToast('اختر قسماً يحتوي على 5 عناصر على الأقل!', 'fa-triangle-exclamation text-neonGold');
+                return;
+            }
+            navigateTo('match');
+            clearInterval(matchState.timerInterval);
+
+            const selected = shuffleArray(pool).slice(0, 5);
+            matchState = { pairs: selected, selectedTerm: null, selectedDef: null, matchedCount: 0, seconds: 0, timerInterval: null };
+
+            document.getElementById('match-progress').textContent = '0';
+            document.getElementById('match-total').textContent = '5';
+            document.getElementById('match-timer').textContent = '0';
+
+            const termsCol = document.getElementById('match-col-terms');
+            const defsCol = document.getElementById('match-col-defs');
+            termsCol.innerHTML = '';
+            defsCol.innerHTML = '';
+
+            shuffleArray(selected).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'match-item glass p-4 rounded-2xl border border-white/15 font-bold text-sm sm:text-base text-white flex items-center justify-between';
+                div.innerHTML = `<span>${item.term}</span><i class="fa-solid fa-link text-slate-500 text-xs"></i>`;
+                div.onclick = () => {
+                    if (div.classList.contains('matched')) return;
+                    playSound('click');
+                    document.querySelectorAll('#match-col-terms .match-item').forEach(x => x.classList.remove('selected'));
+                    div.classList.add('selected');
+                    matchState.selectedTerm = { el: div, id: item.id };
+                    checkMatchPair();
+                };
+                termsCol.appendChild(div);
+            });
+
+            shuffleArray(selected).forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'match-item glass p-4 rounded-2xl border border-white/15 text-xs sm:text-sm text-slate-200 font-tajawal leading-relaxed';
+                div.textContent = item.def;
+                div.onclick = () => {
+                    if (div.classList.contains('matched')) return;
+                    playSound('click');
+                    document.querySelectorAll('#match-col-defs .match-item').forEach(x => x.classList.remove('selected'));
+                    div.classList.add('selected');
+                    matchState.selectedDef = { el: div, id: item.id };
+                    checkMatchPair();
+                };
+                defsCol.appendChild(div);
+            });
+
+            matchState.timerInterval = setInterval(() => {
+                matchState.seconds++;
+                document.getElementById('match-timer').textContent = matchState.seconds;
+            }, 1000);
+        }
+
+        function checkMatchPair() {
+            if (!matchState.selectedTerm || !matchState.selectedDef) return;
+            const t = matchState.selectedTerm;
+            const d = matchState.selectedDef;
+            matchState.selectedTerm = null;
+            matchState.selectedDef = null;
+
+            if (t.id === d.id) {
+                playSound('correct');
+                t.el.classList.remove('selected');
+                d.el.classList.remove('selected');
+                t.el.classList.add('matched');
+                d.el.classList.add('matched');
+                matchState.matchedCount++;
+                document.getElementById('match-progress').textContent = matchState.matchedCount;
+
+                if (matchState.matchedCount === 5) {
+                    clearInterval(matchState.timerInterval);
+                    playSound('win');
+                    const bonus = Math.max(20, 65 - matchState.seconds);
+                    state.xp += bonus;
+                    saveState();
+                    confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+                    showToast(`ممتاز! أنهيت المطابقة في ${matchState.seconds} ثانية (+${bonus} نقطة)`, 'fa-trophy text-neonGold');
+                }
+            } else {
+                playSound('wrong');
+                t.el.classList.add('wrong-pair', 'animate-shake');
+                d.el.classList.add('wrong-pair', 'animate-shake');
+                setTimeout(() => {
+                    t.el.classList.remove('selected', 'wrong-pair', 'animate-shake');
+                    d.el.classList.remove('selected', 'wrong-pair', 'animate-shake');
+                }, 450);
+            }
+        }
+
+        // =========================================================================
+        // 13. ENCYCLOPEDIA EXPLORER
+        // =========================================================================
+        function startExplorerMode() {
+            navigateTo('explorer');
+            document.getElementById('explorer-cat-filter').value = state.selectedCategory;
+            document.getElementById('explorer-unit-filter').value = state.selectedUnit;
+            renderExplorer();
+        }
+
+        function renderExplorer() {
+            const query = document.getElementById('explorer-search').value.trim().toLowerCase();
+            const cat = document.getElementById('explorer-cat-filter').value;
+            const unit = document.getElementById('explorer-unit-filter').value;
+
+            const filtered = CURRICULUM_DATA.filter(item => {
+                const matchCat = cat === 'all' || item.cat === cat;
+                const matchUnit = unit === 'all' || item.unit === unit;
+                const matchQuery = !query || item.term.toLowerCase().includes(query) || item.def.toLowerCase().includes(query);
+                return matchCat && matchUnit && matchQuery;
+            });
+
+            document.getElementById('explorer-count').textContent = filtered.length;
+            const grid = document.getElementById('explorer-grid');
+            grid.innerHTML = '';
+
+            filtered.forEach(item => {
+                const isMastered = state.masteredIds.includes(item.id);
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-2xl p-5 flex flex-col justify-between gap-3';
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-neonCyan">${getCategoryLabel(item.cat)} • و${item.unit}</span>
+                            <button onclick="toggleMasterExplorer('${item.id}')" class="text-xs px-2.5 py-1 rounded-lg ${isMastered ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400 hover:text-white'} transition">
+                                <i class="fa-solid ${isMastered ? 'fa-check-circle' : 'fa-circle'}"></i>
+                            </button>
+                        </div>
+                        <h4 class="text-lg font-extrabold text-white">${item.term}</h4>
+                        <p class="text-xs sm:text-sm text-slate-300 font-tajawal leading-relaxed">${item.def}</p>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function toggleMasterExplorer(id) {
+            const idx = state.masteredIds.indexOf(id);
+            if (idx === -1) {
+                state.masteredIds.push(id);
+                state.xp += 10;
+                playSound('correct');
+            } else {
+                state.masteredIds.splice(idx, 1);
+                playSound('click');
+            }
+            saveState();
+            renderExplorer();
+        }
+
+        // =========================================================================
+        // 14. PARTICLE BACKGROUND ANIMATION
+        // =========================================================================
+        function initParticleBackground() {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height, particles;
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+
+            function createParticles() {
+                particles = [];
+                const count = Math.min(50, Math.floor((width * height) / 24000));
+                const colors = ['#00F5D4', '#9B5DE5', '#00BBF9', '#FEE440'];
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        r: Math.random() * 2 + 0.8,
+                        vx: (Math.random() - 0.5) * 0.4,
+                        vy: (Math.random() - 0.5) * 0.4,
+                        color: colors[Math.floor(Math.random() * colors.length)]
+                    });
+                }
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, width, height);
+                particles.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.globalAlpha = 0.5;
+                    ctx.fill();
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p2 = particles[j];
+                        const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                        if (dist < 125) {
+                            ctx.beginPath();
+                            ctx.moveTo(p.x, p.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.strokeStyle = p.color;
+                            ctx.globalAlpha = (1 - dist / 125) * 0.13;
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                });
+                ctx.globalAlpha = 1;
+                requestAnimationFrame(draw);
+            }
+
+            window.addEventListener('resize', () => { resize(); createParticles(); });
+            resize();
+            createParticles();
+            draw();
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
